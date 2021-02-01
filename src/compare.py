@@ -115,8 +115,8 @@ def home():
     properties = pd.DataFrame(allProperties)
     properties['rnk_price'] = properties['price'].rank(ascending=True)
     properties['rnk_views'] = properties['views'].rank(ascending=False)
-    properties['wgt_price'] = 0.7
-    properties['wgt_views'] = 0.3
+    properties['wgt_price'] = 0.9
+    properties['wgt_views'] = 0.1
 
     properties['rnk_consolidate'] = properties['rnk_price']* properties['wgt_price'] + properties['rnk_views']* properties['wgt_views']
     properties['rnk_consolidate_final'] =properties['rnk_consolidate'].rank()
@@ -125,4 +125,51 @@ def home():
 
     return properties_ranks.to_html()
 
+
+def foundItems(key):
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+
+        cursor = connection.cursor()
+
+        sql_select_Query = " select title_url, price, beds_size_acres, bathrooms, square_meter, property_type, description, ber, date, views "
+        sql_select_Query +=" from public.properties where title ILIKE '%"+key+"%' LIMIT 20 "
+        cursor = connection.cursor()
+
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+        print("Total number of rows in Laptop is: ", cursor.rowcount)
+        listOfProperties = []
+        print("\nPrinting each laptop record")
+        for row in records:
+            # listOfProperties.append(Property())
+            print("url = ", row[0], )
+            print("price = ", row[1], )
+            print("bedSize = ", row[2], )
+            print("bathrooms = ", row[3], )
+            print("sqMeter = ", row[4], )
+            print("propertyType = ", row[5], )
+            print("description = ", row[6], )
+            print("ber = ", row[7], )
+            print("date = ", row[8], )
+            print("views  = ", row[9], "\n")
+            listOfProperties.append(
+                Property(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], "", ""))
+
+        return listOfProperties
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
+@app.route('/find', methods=['GET'])
+def find():
+    key = request.args.get('key')
+    return json.dumps([ob.__dict__ for ob in foundItems(key)])
 app.run()
