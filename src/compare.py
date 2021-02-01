@@ -172,4 +172,10 @@ def foundItems(key):
 def find():
     key = request.args.get('key')
     return json.dumps([ob.__dict__ for ob in foundItems(key)])
+
+@app.after_request
+def apply_caching(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
 app.run()
