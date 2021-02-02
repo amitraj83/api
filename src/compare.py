@@ -92,7 +92,7 @@ def home():
     url3 = request.args.get('url3')
     url4 = request.args.get('url4')
     url5 = request.args.get('url5')
-    priceAsc = bool(request.args.get('priceAsc') == "True")
+    priceAsc = not bool(request.args.get('priceAsc') == "True")
     viewsAsc = bool(request.args.get('viewsAsc') == "True")
     bedSizeAsc = bool(request.args.get('bedSizeAsc') == "True")
     bathroomsAsc = bool(request.args.get('bathroomsAsc') == "True")
