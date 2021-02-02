@@ -92,38 +92,39 @@ def home():
     url3 = request.args.get('url3')
     url4 = request.args.get('url4')
     url5 = request.args.get('url5')
-    #data = compare(url1, url2, url3, url4, url5)
-    #pd.DataFrame(data)
-    """
-    data["Rank"] = data["Name"].rank()
-
-    # display
-    data
-
-    # sorting w.r.t name column
-    data.sort_values("Name", inplace=True)
-
-    # display after sorting w.r.t Name column
-    data
-    
-    """
+    priceAsc = bool(request.args.get('priceAsc') == "True")
+    viewsAsc = bool(request.args.get('viewsAsc') == "True")
+    bedSizeAsc = bool(request.args.get('bedSizeAsc') == "True")
+    bathroomsAsc = bool(request.args.get('bathroomsAsc') == "True")
+    sqMeterAsc = bool(request.args.get('sqMeterAsc') == "True")
     allProperties = []
     for eachProperty in compare(url1, url2, url3, url4, url5):
 
         allProperties.append(eachProperty.__dict__)
 
     properties = pd.DataFrame(allProperties)
-    properties['rnk_price'] = properties['price'].rank(ascending=True)
-    properties['rnk_views'] = properties['views'].rank(ascending=False)
-    properties['wgt_price'] = 0.9
+    properties['rnk_price'] = properties['price'].rank(ascending=priceAsc)
+    properties['rnk_views'] = properties['views'].rank(ascending=viewsAsc)
+    properties['rnk_bedSize'] = properties['bedSize'].rank(ascending=bedSizeAsc)
+    properties['rnk_bathrooms'] = properties['bathrooms'].rank(ascending=bathroomsAsc)
+    properties['rnk_sqMeter'] = properties['sqMeter'].rank(ascending=sqMeterAsc)
+    properties['wgt_price'] = 0.5
+    properties['wgt_bedSize'] = 0.2
     properties['wgt_views'] = 0.1
+    properties['wgt_bathrooms'] = 0.1
+    properties['wgt_sqMeter'] = 0.1
 
-    properties['rnk_consolidate'] = properties['rnk_price']* properties['wgt_price'] + properties['rnk_views']* properties['wgt_views']
+    bathroomConsolidate = properties['rnk_bathrooms']* properties['wgt_bathrooms']
+    priceConsolidate = properties['rnk_price']* properties['wgt_price']
+    viewsConsolidate = properties['rnk_views']* properties['wgt_views']
+    bedsConsolidate = properties['rnk_bedSize']* properties['wgt_bedSize']
+    sqMeterConsolidate = properties['rnk_sqMeter']* properties['wgt_sqMeter']
+    properties['rnk_consolidate'] = bathroomConsolidate + priceConsolidate + viewsConsolidate + bedsConsolidate + sqMeterConsolidate
     properties['rnk_consolidate_final'] =properties['rnk_consolidate'].rank()
 
-    properties_ranks = properties[['price','views','rnk_consolidate_final','url']]
+    properties_ranks = properties[['price','views','rnk_consolidate_final','url','bedSize','bathrooms','sqMeter']]
 
-    return properties_ranks.to_html()
+    return properties_ranks.to_json()
 
 
 def foundItems(key):
