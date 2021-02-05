@@ -75,7 +75,7 @@ def compareData(vid1, vid2, vid3):
         if vid3:
             sql_select_Query += ", "+vid3+" "
 
-        sql_select_Query += " )"
+        sql_select_Query += " ) "
         print(sql_select_Query)
         cursor = connection.cursor()
         cursor.execute(sql_select_Query)
@@ -146,7 +146,7 @@ def compareCars():
         cars['rnk_consolidate_final'] = cars['rnk_consolidate'].rank()
 
         cars_ranks = cars[['rnk_consolidate_final', 'model_id', 'model_make_display', 'model_name', 'model_year', 'model_engine_cc', 'model_engine_cyl', 'model_engine_power_rpm', 'model_engine_torque_rpm', 'model_seats', 'model_doors', 'model_width_mm', 'model_height_mm']]
-        return cars_ranks.to_html()
+        return cars_ranks.to_json()
         # return json.dumps([ob.__dict__ for ob in data])
     else:
         return "no data. provide vid1, vid2 and vid3 in query params"
@@ -162,6 +162,9 @@ def foundItems(key):
 
         if key:
             sql_select_Query += "  where model_make_display ILIKE '%"+key+"%' or model_name ILIKE '%"+key+"%'"
+
+        sql_select_Query += " order by model_year DESC "
+
         cursor = connection.cursor()
 
         cursor.execute(sql_select_Query)
