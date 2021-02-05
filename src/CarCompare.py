@@ -61,6 +61,15 @@ class LightCar:
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
+class Criteria:
+    def __init__(self, col_name, display_name, description):
+        self.col_name = col_name
+        self.display_name = display_name
+        self.description = description
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
+
+
 
 def compareData(vid1, vid2, vid3):
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
@@ -189,6 +198,34 @@ def listCarsAPI():
     key = request.args.get('key')
     # return json.dumps(foundItems(key))
     return json.dumps([ob.__dict__ for ob in foundItems(key)])
+
+@app.route('/criteria', methods=['GET'])
+def listCriteria():
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+        sql_select_Query = "SELECT * FROM cars.criteria ORDER BY col_name ASC  "
+
+        cursor = connection.cursor()
+
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+        listOfCriteria = []
+        for row in records:
+            listOfCriteria.append(Criteria(row[0], row[1], row[2]))
+
+        return json.dumps([ob.__dict__ for ob in listOfCriteria])
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
 
 
 
