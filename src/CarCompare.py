@@ -235,4 +235,4 @@ def apply_caching(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
-app.run()
+app.run(host='0.0.0.0')
