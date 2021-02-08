@@ -1,1 +1,3 @@
 http://127.0.0.1:5000/?url1=https://www.daft.ie/for-sale/detached-house-enaghroe-fedamore-co-limerick/2879802&url2=https://www.daft.ie/for-sale/apartment-11-garthy-wood-knocklyon-dublin-16/2844987&url3=https://www.daft.ie/for-sale/apartment-11b-windmill-heights-belvedere-road-wexford-town-co-wexford/2757478&url4=https://www.daft.ie/for-sale/apartment-120-the-peninsula-clane-co-kildare/2868940&url5=https://www.daft.ie/for-sale/apartment-13-rivergrove-oranmore-co-galway/2757606
+
+http://127.0.0.1:5000/compare/cars?vid1=74309&vid2=74796&vid3=74300
