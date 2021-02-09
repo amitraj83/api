@@ -107,13 +107,34 @@ def compareData(vid1, vid2, vid3):
 
 
 
-@app.route('/compare/cars', methods=['GET'])
+@app.route('/compare/cars', methods=['POST'])
 def compareCars():
-    vid1 = str(request.args.get('vid1'))
-    vid2 = str(request.args.get('vid2'))
-    vid3 = str(request.args.get('vid3'))
+
+    if not request.data :
+        return {};
+
+    cars = json.loads(request.data)['cars']
+    if len(cars) > 3:
+        return {}
+    vid1 = None
+    vid2 = None
+    vid3 = None
+    if cars[0]:
+        vid1 = str(cars[0])
+    if cars[1]:
+        vid2 = str(cars[1])
+    if cars[2]:
+        vid3 = str(cars[2])
+
     data = compareData(vid1, vid2, vid3)
-    #return json.dumps([ob.__dict__ for ob in data])
+    #return json.dumps([ob.__dict__ for ob in data]) json.loads(request.data)['criteria']
+    #len(json.loads(request.data)['criteria'][0]) = 3
+    #json.loads(request.data)['criteria'][0][0]
+    #json.loads(request.data)['criteria'][0][1]
+    #json.loads(request.data)['criteria'][0][2]
+    #len(json.loads(request.data)['cars']) = 3
+    #json.loads(request.data)['cars'][1]
+    #json.loads(request.data)['cars'][0]
 
     if data:
         allData = []
