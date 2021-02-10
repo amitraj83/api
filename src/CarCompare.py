@@ -70,7 +70,7 @@ class Criteria:
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 class LinkInformation:
-    def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data):
+    def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data, url):
         self.id = id
         self.car_ids = car_ids
         self.criteria = criteria
@@ -79,6 +79,7 @@ class LinkInformation:
         self.summary = summary
         self.page_title = page_title
         self.other_data = other_data
+        self.url = url
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
@@ -281,14 +282,14 @@ def getLinkData(key):
     try:
         cursor = connection.cursor()
 
-        sql_select_Query = " select car_ids, criteria, response, display_text, summary, page_title, other_data from cars.car_links where id = "+key
+        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where id = "+key
 
         if key:
             cursor.execute(sql_select_Query)
             records = cursor.fetchall()
             linkInfo = None
             for row in records:
-                linkInfo = LinkInformation(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                linkInfo = LinkInformation(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
 
         return linkInfo
     except (Exception, psycopg2.Error) as error:
@@ -304,8 +305,8 @@ def getLinkData(key):
 @app.route('/links/information', methods=['GET'])
 def getLinkInformation():
     linkNumber = request.args.get('linkNumber')
-    # return json.dumps(foundItems(key))
-    return json.dumps([ob.__dict__ for ob in getLinkData(linkNumber)])
+    data = getLinkData(linkNumber)
+    return data.toJSON()
 
 @app.route('/list/cars', methods=['GET'])
 def listCarsAPI():
