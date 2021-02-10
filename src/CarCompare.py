@@ -69,7 +69,18 @@ class Criteria:
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
-
+class LinkInformation:
+    def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data):
+        self.id = id
+        self.car_ids = car_ids
+        self.criteria = criteria
+        self.response = response
+        self.display_text = display_text
+        self.summary = summary
+        self.page_title = page_title
+        self.other_data = other_data
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 def compareData(vid1, vid2, vid3):
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
@@ -105,6 +116,46 @@ def compareData(vid1, vid2, vid3):
             print("PostgreSQL connection is closed")
 
 
+def insertLink(carsRequest, rankCriteria, rank_json, versus, category):
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    number = None
+    try:
+        cursor = connection.cursor()
+        cursor.execute("select nextval('cars.car_links_id_seq'::regclass)")
+        number = cursor.fetchone()
+        if not rankCriteria:
+            rankCriteria = '{}'
+        cursor = connection.cursor()
+        postgres_insert_query = " INSERT INTO cars.car_links "
+        postgres_insert_query += " (id, car_ids, criteria, response, display_text, summary, page_title, other_data, url) "
+        postgres_insert_query += " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s , %s )"
+        # postgres_insert_query += " VALUES ("
+        # postgres_insert_query +=   number[0]+", "
+        # postgres_insert_query += " array"+str(carsRequest)+", "
+        # postgres_insert_query += "  "
+        # # postgres_insert_query += " "+rank_json+", "
+        # # postgres_insert_query += " '', "
+        # # postgres_insert_query += " '', "
+        # # postgres_insert_query += " '', "
+        # # postgres_insert_query += " '{}' "
+        url = "/compare/" + category + "/" + str(number[0]) + "/" + versus
+        record_to_insert = (number[0], (carsRequest,), rankCriteria, rank_json, '', '', '', '{}', url,)
+
+        # print("LInk Query", postgres_insert_query)
+        cursor.execute(postgres_insert_query, record_to_insert)
+
+        return url
+    except (Exception, psycopg2.Error) as error:
+        print("Error inserting link data to MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
 
 
 @app.route('/compare/cars', methods=['POST'])
@@ -113,18 +164,19 @@ def compareCars():
     if not request.data :
         return {};
 
-    cars = json.loads(request.data)['cars']
-    if len(cars) > 3:
+    carsRequest = json.loads(request.data)['cars']
+    rankCriteria = json.loads(request.data)['criteria']
+    if len(carsRequest) > 3:
         return {}
     vid1 = None
     vid2 = None
     vid3 = None
-    if cars[0]:
-        vid1 = str(cars[0])
-    if cars[1]:
-        vid2 = str(cars[1])
-    if cars[2]:
-        vid3 = str(cars[2])
+    if carsRequest[0]:
+        vid1 = str(carsRequest[0])
+    if carsRequest[1]:
+        vid2 = str(carsRequest[1])
+    if carsRequest[2]:
+        vid3 = str(carsRequest[2])
 
     data = compareData(vid1, vid2, vid3)
     #return json.dumps([ob.__dict__ for ob in data]) json.loads(request.data)['criteria']
@@ -176,7 +228,16 @@ def compareCars():
         cars['rnk_consolidate_final'] = cars['rnk_consolidate'].rank()
 
         cars_ranks = cars[['rnk_consolidate_final', 'model_id', 'model_make_display', 'model_name', 'model_year', 'model_engine_cc', 'model_engine_cyl', 'model_engine_power_rpm', 'model_engine_torque_rpm', 'model_seats', 'model_doors', 'model_width_mm', 'model_height_mm']]
-        return cars_ranks.to_json()
+        rank_json = cars_ranks.to_json()
+        versus = ""
+        dash = "-vs-"
+        for i in range(len(cars_ranks['model_make_display'])):
+            if i == len(cars_ranks['model_make_display']) -1:
+                dash = ""
+            versus += cars_ranks['model_make_display'][i]+"-"+cars_ranks['model_name'][i]+"-"+str(int(cars_ranks['model_year'][i]))+dash
+        #cars_ranks['model_make_display'][0]+"-"+cars_ranks['model_name'][0]+"-"+str(int(cars_ranks['model_year'][0]))
+        pushUrl = insertLink(carsRequest,rankCriteria, rank_json, versus, "cars")
+        return {"cars_ranks":cars_ranks.to_json(), "pushUrl":pushUrl}
         # return json.dumps([ob.__dict__ for ob in data])
     else:
         return "no data. provide vid1, vid2 and vid3 in query params"
@@ -213,6 +274,38 @@ def foundItems(key):
             connection.close()
             print("PostgreSQL connection is closed")
 
+
+def getLinkData(key):
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+
+        sql_select_Query = " select car_ids, criteria, response, display_text, summary, page_title, other_data from cars.car_links where id = "+key
+
+        if key:
+            cursor.execute(sql_select_Query)
+            records = cursor.fetchall()
+            linkInfo = None
+            for row in records:
+                linkInfo = LinkInformation(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+
+        return linkInfo
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
+@app.route('/links/information', methods=['GET'])
+def getLinkInformation():
+    linkNumber = request.args.get('linkNumber')
+    # return json.dumps(foundItems(key))
+    return json.dumps([ob.__dict__ for ob in getLinkData(linkNumber)])
 
 @app.route('/list/cars', methods=['GET'])
 def listCarsAPI():
