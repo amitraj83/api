@@ -141,7 +141,7 @@ def insertLink(carsRequest, rankCriteria, rank_json, versus, category):
         # # postgres_insert_query += " '', "
         # # postgres_insert_query += " '{}' "
         url = "/compare/" + category + "/" + str(number[0]) + "/" + versus
-        record_to_insert = (number[0], (carsRequest,), rankCriteria, rank_json, '', '', '', '{}', url,)
+        record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, '', '', '', '{}', url,)
 
         # print("LInk Query", postgres_insert_query)
         cursor.execute(postgres_insert_query, record_to_insert)
@@ -196,36 +196,54 @@ def compareCars():
             allData.append(eachCar.__dict__)
 
         cars = pd.DataFrame(allData)
-        cars['rnk_model_year'] = cars['model_year'].rank(ascending=False)
-        cars['rnk_model_engine_cc'] = cars['model_engine_cc'].rank(ascending=False)
-        cars['rnk_model_engine_cyl'] = cars['model_engine_cyl'].rank(ascending=False)
-        cars['rnk_model_engine_power_rpm'] = cars['model_engine_power_rpm'].rank(ascending=False)
-        cars['rnk_model_engine_torque_rpm'] = cars['model_engine_torque_rpm'].rank(ascending=False)
-        cars['rnk_model_seats'] = cars['model_seats'].rank(ascending=False)
-        cars['rnk_model_doors'] = cars['model_doors'].rank(ascending=False)
-        cars['rnk_model_width_mm'] = cars['model_width_mm'].rank(ascending=False)
-        cars['rnk_model_height_mm'] = cars['model_height_mm'].rank(ascending=False)
-        cars['wgt_model_year'] = 0.3
-        cars['wgt_model_engine_cc'] = 0.1
-        cars['wgt_model_engine_cyl'] = 0.05
-        cars['wgt_model_engine_power_rpm'] = 0.05
-        cars['wgt_model_engine_torque_rpm'] = 0.05
-        cars['wgt_model_seats'] = 0.2
-        cars['wgt_model_doors'] = 0.1
-        cars['wgt_model_width_mm'] = 0.1
-        cars['wgt_model_height_mm'] = 0.1
 
-        model_year_Consilidate = cars['rnk_model_year'] * cars['wgt_model_year']
-        model_engine_cc_Consolidate = cars['rnk_model_engine_cc'] * cars['wgt_model_engine_cc']
-        model_engine_cyl_Consolidate = cars['rnk_model_engine_cyl'] * cars['wgt_model_engine_cyl']
-        model_engine_power_rpm_Consolidate = cars['rnk_model_engine_power_rpm'] * cars['wgt_model_engine_power_rpm']
-        model_engine_torque_rpm_Consolidate = cars['rnk_model_engine_torque_rpm'] * cars['wgt_model_engine_torque_rpm']
-        model_seats_Consolidate = cars['rnk_model_seats'] * cars['wgt_model_seats']
-        model_doors_Consolidate = cars['rnk_model_doors'] * cars['wgt_model_doors']
-        model_width_mm_Consolidate = cars['rnk_model_width_mm'] * cars['wgt_model_width_mm']
-        model_height_mm_Consolidate = cars['rnk_model_height_mm'] * cars['wgt_model_height_mm']
+        totalWgt = 0
+        for i in range(len(rankCriteria[0])):
+            cars['rnk_'+rankCriteria[0][i]['col_name']] = cars[rankCriteria[0][i]['col_name']].rank(ascending=(rankCriteria[0][i]['preference'] == "True"))
+            totalWgt += int(rankCriteria[0][0]['importance'])
 
-        cars['rnk_consolidate'] = model_year_Consilidate + model_engine_cc_Consolidate + model_engine_cyl_Consolidate + model_engine_power_rpm_Consolidate + model_engine_torque_rpm_Consolidate + model_seats_Consolidate + model_doors_Consolidate + model_width_mm_Consolidate + model_height_mm_Consolidate
+
+
+        # cars['rnk_model_year'] = cars['model_year'].rank(ascending=False)
+        # cars['rnk_model_engine_cc'] = cars['model_engine_cc'].rank(ascending=False)
+        # cars['rnk_model_engine_cyl'] = cars['model_engine_cyl'].rank(ascending=False)
+        # cars['rnk_model_engine_power_rpm'] = cars['model_engine_power_rpm'].rank(ascending=False)
+        # cars['rnk_model_engine_torque_rpm'] = cars['model_engine_torque_rpm'].rank(ascending=False)
+        # cars['rnk_model_seats'] = cars['model_seats'].rank(ascending=False)
+        # cars['rnk_model_doors'] = cars['model_doors'].rank(ascending=False)
+        # cars['rnk_model_width_mm'] = cars['model_width_mm'].rank(ascending=False)
+        # cars['rnk_model_height_mm'] = cars['model_height_mm'].rank(ascending=False)
+
+        if totalWgt != 0:
+            for i in range(len(rankCriteria[0])):
+                cars['wgt_' + rankCriteria[0][i]['col_name']] = int(rankCriteria[0][i]['importance']) / totalWgt
+        # cars['wgt_model_year'] = 0.3
+        # cars['wgt_model_engine_cc'] = 0.1
+        # cars['wgt_model_engine_cyl'] = 0.05
+        # cars['wgt_model_engine_power_rpm'] = 0.05
+        # cars['wgt_model_engine_torque_rpm'] = 0.05
+        # cars['wgt_model_seats'] = 0.2
+        # cars['wgt_model_doors'] = 0.1
+        # cars['wgt_model_width_mm'] = 0.1
+        # cars['wgt_model_height_mm'] = 0.1
+
+        # model_year_Consilidate = cars['rnk_model_year'] * cars['wgt_model_year']
+        # model_engine_cc_Consolidate = cars['rnk_model_engine_cc'] * cars['wgt_model_engine_cc']
+        # model_engine_cyl_Consolidate = cars['rnk_model_engine_cyl'] * cars['wgt_model_engine_cyl']
+        # model_engine_power_rpm_Consolidate = cars['rnk_model_engine_power_rpm'] * cars['wgt_model_engine_power_rpm']
+        # model_engine_torque_rpm_Consolidate = cars['rnk_model_engine_torque_rpm'] * cars['wgt_model_engine_torque_rpm']
+        # model_seats_Consolidate = cars['rnk_model_seats'] * cars['wgt_model_seats']
+        # model_doors_Consolidate = cars['rnk_model_doors'] * cars['wgt_model_doors']
+        # model_width_mm_Consolidate = cars['rnk_model_width_mm'] * cars['wgt_model_width_mm']
+        # model_height_mm_Consolidate = cars['rnk_model_height_mm'] * cars['wgt_model_height_mm']
+        rankConsolidate = 0
+        for i in range(len(rankCriteria[0])):
+            rankConsolidate += cars['rnk_'+rankCriteria[0][i]['col_name']] * cars['wgt_'+rankCriteria[0][i]['col_name']]
+
+
+        # cars['rnk_consolidate'] = model_year_Consilidate + model_engine_cc_Consolidate + model_engine_cyl_Consolidate + model_engine_power_rpm_Consolidate + model_engine_torque_rpm_Consolidate + model_seats_Consolidate + model_doors_Consolidate + model_width_mm_Consolidate + model_height_mm_Consolidate
+        cars['rnk_consolidate'] = rankConsolidate
+
         cars['rnk_consolidate_final'] = cars['rnk_consolidate'].rank()
 
         cars_ranks = cars[['rnk_consolidate_final', 'model_id', 'model_make_display', 'model_name', 'model_year', 'model_engine_cc', 'model_engine_cyl', 'model_engine_power_rpm', 'model_engine_torque_rpm', 'model_seats', 'model_doors', 'model_width_mm', 'model_height_mm']]
@@ -237,7 +255,7 @@ def compareCars():
                 dash = ""
             versus += cars_ranks['model_make_display'][i]+"-"+cars_ranks['model_name'][i]+"-"+str(int(cars_ranks['model_year'][i]))+dash
         #cars_ranks['model_make_display'][0]+"-"+cars_ranks['model_name'][0]+"-"+str(int(cars_ranks['model_year'][0]))
-        pushUrl = insertLink(carsRequest,rankCriteria, rank_json, versus, "cars")
+        pushUrl = insertLink(carsRequest,rankCriteria[0], rank_json, versus, "cars")
         return {"cars_ranks":cars_ranks.to_json(), "pushUrl":pushUrl}
         # return json.dumps([ob.__dict__ for ob in data])
     else:
