@@ -93,7 +93,7 @@ class Variant:
 
 
 class LinkInformation:
-    def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data, url):
+    def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data, url, carDetails):
         self.id = id
         self.car_ids = car_ids
         self.criteria = criteria
@@ -103,6 +103,7 @@ class LinkInformation:
         self.page_title = page_title
         self.other_data = other_data
         self.url = url
+        self.carDetails = carDetails
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
@@ -149,20 +150,12 @@ def insertLink(carsRequest, rankCriteria, rank_json, versus, category):
         cursor.execute("select nextval('cars.car_links_id_seq'::regclass)")
         number = cursor.fetchone()
         if not rankCriteria:
-            rankCriteria = '{}'
+            rankCriteria = []
         cursor = connection.cursor()
         postgres_insert_query = " INSERT INTO cars.car_links "
         postgres_insert_query += " (id, car_ids, criteria, response, display_text, summary, page_title, other_data, url) "
         postgres_insert_query += " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s , %s )"
-        # postgres_insert_query += " VALUES ("
-        # postgres_insert_query +=   number[0]+", "
-        # postgres_insert_query += " array"+str(carsRequest)+", "
-        # postgres_insert_query += "  "
-        # # postgres_insert_query += " "+rank_json+", "
-        # # postgres_insert_query += " '', "
-        # # postgres_insert_query += " '', "
-        # # postgres_insert_query += " '', "
-        # # postgres_insert_query += " '{}' "
+
         url = "/compare/" + category + "/" + str(number[0]) + "/" + versus
         record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, '', '', '', '{}', url,)
 
@@ -322,6 +315,7 @@ def getLinkData(key):
                                   database="daft")
     try:
         cursor = connection.cursor()
+        cursor2 = connection.cursor()
 
         sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where id = "+key
 
@@ -330,7 +324,20 @@ def getLinkData(key):
             records = cursor.fetchall()
             linkInfo = None
             for row in records:
-                linkInfo = LinkInformation(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
+                carDetails = []
+                listofId = str(row[1]).replace("[", "(").replace("]",")")
+                carsQuery = " select model_id, model_make_id, model_name, model_trim, model_year, model_body, model_engine_position, model_engine_cc, model_engine_cyl, model_engine_type, model_engine_valves_per_cyl, model_engine_power_ps, model_engine_power_rpm, model_engine_torque_nm, model_engine_torque_rpm, model_engine_bore_mm, model_engine_stroke_mm, model_engine_compression, model_engine_fuel, model_top_speed_kph, model_0_to_100_kph, model_drive, model_transmission_type, model_seats, model_doors, model_weight_kg, model_length_mm, model_width_mm, model_height_mm, model_wheelbase_mm, model_lkm_hwy, model_lkm_mixed, model_lkm_city, model_fuel_cap_l, model_sold_in_us, model_co2, model_make_display from cars.car where model_id in "+listofId
+                cursor2.execute(carsQuery)
+                carRecords = cursor2.fetchall()
+                for carRow in carRecords:
+                    carDetails.append(Car(carRow[0], carRow[1], carRow[2], carRow[3], carRow[4], carRow[5], carRow[6], carRow[7], carRow[8], carRow[9], carRow[10], carRow[11],
+                    carRow[12], carRow[13], carRow[14], carRow[15], carRow[16], carRow[17], carRow[18], carRow[19], carRow[20], carRow[21], carRow[22],
+                    carRow[23], carRow[24], carRow[25], carRow[26], carRow[27], carRow[28], carRow[29], carRow[30], carRow[31], carRow[32], carRow[33],
+                    carRow[34], carRow[35], carRow[36]))
+                newCarDetails = json.dumps([ob.__dict__ for ob in carDetails])
+                if not newCarDetails:
+                    newCarDetails = row[3]
+                linkInfo = LinkInformation(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], newCarDetails)
 
         return linkInfo
     except (Exception, psycopg2.Error) as error:
