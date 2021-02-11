@@ -69,6 +69,29 @@ class Criteria:
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
+class Make:
+    def __init__(self, value, label):
+        self.value = value
+        self.label = label
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
+
+class Model:
+    def __init__(self, value, label):
+        self.value = value
+        self.label = label
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
+
+class Variant:
+    def __init__(self, value, label):
+        self.value = value
+        self.label = label
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
+
+
+
 class LinkInformation:
     def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data, url):
         self.id = id
@@ -198,51 +221,51 @@ def compareCars():
         cars = pd.DataFrame(allData)
 
         totalWgt = 0
-        for i in range(len(rankCriteria[0])):
-            cars['rnk_'+rankCriteria[0][i]['col_name']] = cars[rankCriteria[0][i]['col_name']].rank(ascending=(rankCriteria[0][i]['preference'] == "True"))
-            totalWgt += int(rankCriteria[0][0]['importance'])
-
-
-
-        # cars['rnk_model_year'] = cars['model_year'].rank(ascending=False)
-        # cars['rnk_model_engine_cc'] = cars['model_engine_cc'].rank(ascending=False)
-        # cars['rnk_model_engine_cyl'] = cars['model_engine_cyl'].rank(ascending=False)
-        # cars['rnk_model_engine_power_rpm'] = cars['model_engine_power_rpm'].rank(ascending=False)
-        # cars['rnk_model_engine_torque_rpm'] = cars['model_engine_torque_rpm'].rank(ascending=False)
-        # cars['rnk_model_seats'] = cars['model_seats'].rank(ascending=False)
-        # cars['rnk_model_doors'] = cars['model_doors'].rank(ascending=False)
-        # cars['rnk_model_width_mm'] = cars['model_width_mm'].rank(ascending=False)
-        # cars['rnk_model_height_mm'] = cars['model_height_mm'].rank(ascending=False)
-
-        if totalWgt != 0:
+        if rankCriteria:
             for i in range(len(rankCriteria[0])):
-                cars['wgt_' + rankCriteria[0][i]['col_name']] = int(rankCriteria[0][i]['importance']) / totalWgt
-        # cars['wgt_model_year'] = 0.3
-        # cars['wgt_model_engine_cc'] = 0.1
-        # cars['wgt_model_engine_cyl'] = 0.05
-        # cars['wgt_model_engine_power_rpm'] = 0.05
-        # cars['wgt_model_engine_torque_rpm'] = 0.05
-        # cars['wgt_model_seats'] = 0.2
-        # cars['wgt_model_doors'] = 0.1
-        # cars['wgt_model_width_mm'] = 0.1
-        # cars['wgt_model_height_mm'] = 0.1
+                cars['rnk_'+rankCriteria[0][i]['col_name']] = cars[rankCriteria[0][i]['col_name']].rank(ascending=(rankCriteria[0][i]['preference'] == "True"))
+                totalWgt += int(rankCriteria[0][0]['importance'])
+            if totalWgt != 0:
+                for i in range(len(rankCriteria[0])):
+                    cars['wgt_' + rankCriteria[0][i]['col_name']] = int(rankCriteria[0][i]['importance']) / totalWgt
+            rankConsolidate = 0
+            for i in range(len(rankCriteria[0])):
+                rankConsolidate += cars['rnk_' + rankCriteria[0][i]['col_name']] * cars[
+                    'wgt_' + rankCriteria[0][i]['col_name']]
+            cars['rnk_consolidate'] = rankConsolidate
+        else:
+            cars['rnk_model_year'] = cars['model_year'].rank(ascending=False)
+            cars['rnk_model_engine_cc'] = cars['model_engine_cc'].rank(ascending=False)
+            cars['rnk_model_engine_cyl'] = cars['model_engine_cyl'].rank(ascending=False)
+            cars['rnk_model_engine_power_rpm'] = cars['model_engine_power_rpm'].rank(ascending=False)
+            cars['rnk_model_engine_torque_rpm'] = cars['model_engine_torque_rpm'].rank(ascending=False)
+            cars['rnk_model_seats'] = cars['model_seats'].rank(ascending=False)
+            cars['rnk_model_doors'] = cars['model_doors'].rank(ascending=False)
+            cars['rnk_model_width_mm'] = cars['model_width_mm'].rank(ascending=False)
+            cars['rnk_model_height_mm'] = cars['model_height_mm'].rank(ascending=False)
 
-        # model_year_Consilidate = cars['rnk_model_year'] * cars['wgt_model_year']
-        # model_engine_cc_Consolidate = cars['rnk_model_engine_cc'] * cars['wgt_model_engine_cc']
-        # model_engine_cyl_Consolidate = cars['rnk_model_engine_cyl'] * cars['wgt_model_engine_cyl']
-        # model_engine_power_rpm_Consolidate = cars['rnk_model_engine_power_rpm'] * cars['wgt_model_engine_power_rpm']
-        # model_engine_torque_rpm_Consolidate = cars['rnk_model_engine_torque_rpm'] * cars['wgt_model_engine_torque_rpm']
-        # model_seats_Consolidate = cars['rnk_model_seats'] * cars['wgt_model_seats']
-        # model_doors_Consolidate = cars['rnk_model_doors'] * cars['wgt_model_doors']
-        # model_width_mm_Consolidate = cars['rnk_model_width_mm'] * cars['wgt_model_width_mm']
-        # model_height_mm_Consolidate = cars['rnk_model_height_mm'] * cars['wgt_model_height_mm']
-        rankConsolidate = 0
-        for i in range(len(rankCriteria[0])):
-            rankConsolidate += cars['rnk_'+rankCriteria[0][i]['col_name']] * cars['wgt_'+rankCriteria[0][i]['col_name']]
+            cars['wgt_model_year'] = 0.3
+            cars['wgt_model_engine_cc'] = 0.1
+            cars['wgt_model_engine_cyl'] = 0.05
+            cars['wgt_model_engine_power_rpm'] = 0.05
+            cars['wgt_model_engine_torque_rpm'] = 0.05
+            cars['wgt_model_seats'] = 0.2
+            cars['wgt_model_doors'] = 0.1
+            cars['wgt_model_width_mm'] = 0.1
+            cars['wgt_model_height_mm'] = 0.1
 
+            model_year_Consilidate = cars['rnk_model_year'] * cars['wgt_model_year']
+            model_engine_cc_Consolidate = cars['rnk_model_engine_cc'] * cars['wgt_model_engine_cc']
+            model_engine_cyl_Consolidate = cars['rnk_model_engine_cyl'] * cars['wgt_model_engine_cyl']
+            model_engine_power_rpm_Consolidate = cars['rnk_model_engine_power_rpm'] * cars['wgt_model_engine_power_rpm']
+            model_engine_torque_rpm_Consolidate = cars['rnk_model_engine_torque_rpm'] * cars['wgt_model_engine_torque_rpm']
+            model_seats_Consolidate = cars['rnk_model_seats'] * cars['wgt_model_seats']
+            model_doors_Consolidate = cars['rnk_model_doors'] * cars['wgt_model_doors']
+            model_width_mm_Consolidate = cars['rnk_model_width_mm'] * cars['wgt_model_width_mm']
+            model_height_mm_Consolidate = cars['rnk_model_height_mm'] * cars['wgt_model_height_mm']
 
-        # cars['rnk_consolidate'] = model_year_Consilidate + model_engine_cc_Consolidate + model_engine_cyl_Consolidate + model_engine_power_rpm_Consolidate + model_engine_torque_rpm_Consolidate + model_seats_Consolidate + model_doors_Consolidate + model_width_mm_Consolidate + model_height_mm_Consolidate
-        cars['rnk_consolidate'] = rankConsolidate
+            cars['rnk_consolidate'] = model_year_Consilidate + model_engine_cc_Consolidate + model_engine_cyl_Consolidate + model_engine_power_rpm_Consolidate + model_engine_torque_rpm_Consolidate + model_seats_Consolidate + model_doors_Consolidate + model_width_mm_Consolidate + model_height_mm_Consolidate
+
 
         cars['rnk_consolidate_final'] = cars['rnk_consolidate'].rank()
 
@@ -255,7 +278,7 @@ def compareCars():
                 dash = ""
             versus += cars_ranks['model_make_display'][i]+"-"+cars_ranks['model_name'][i]+"-"+str(int(cars_ranks['model_year'][i]))+dash
         #cars_ranks['model_make_display'][0]+"-"+cars_ranks['model_name'][0]+"-"+str(int(cars_ranks['model_year'][0]))
-        pushUrl = insertLink(carsRequest,rankCriteria[0], rank_json, versus, "cars")
+        pushUrl = insertLink(carsRequest, rankCriteria[0] if rankCriteria else None, rank_json, versus, "cars")
         return {"cars_ranks":cars_ranks.to_json(), "pushUrl":pushUrl}
         # return json.dumps([ob.__dict__ for ob in data])
     else:
@@ -365,11 +388,104 @@ def getCarDetails(id):
 def getCar():
     id = request.args.get('id')
     # return json.dumps(foundItems(key))
+    description = json.dumps([ob.__dict__ for ob in listAllFields()])
     return getCarDetails(id).toJSON()
 
 
-@app.route('/criteria', methods=['GET'])
-def listCriteria():
+def getAllMakes():
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+        sql_select_Query = " select model_make_id, model_make_display from cars.car group by model_make_id, model_make_display "
+
+        cursor = connection.cursor()
+        cursor.execute(sql_select_Query)
+
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+        allMakes = []
+        for row in records:
+            allMakes.append(Make(row[0], row[1]))
+        return allMakes
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
+def getMakesForAModel(key):
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+        # sql_select_Query = " select  distinct model_name from cars.car where model_make_id = '"+key+"' "
+        sql_select_Query = " select  distinct (model_name || ' (' || model_year || ')') as modelName, model_name, model_year from cars.car where model_make_id ILIKE '"+key+"' order by model_year DESC "
+        cursor = connection.cursor()
+        cursor.execute(sql_select_Query)
+
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+        allModels = []
+        for row in records:
+            allModels.append(Model(row[1], row[0]))
+        return allModels
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
+
+
+@app.route('/car/makes', methods=['GET'])
+def getMakes():
+
+    # return json.dumps(foundItems(key))
+    return json.dumps([ob.__dict__ for ob in getAllMakes()])
+
+@app.route('/car/models', methods=['GET'])
+def getModels():
+    make = request.args.get('make')
+    # return json.dumps(foundItems(key))
+    return json.dumps([ob.__dict__ for ob in getMakesForAModel(make)])
+
+
+def getVariants(make, model):
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+        sql_select_Query = " select model_trim, model_id, model_year  from cars.car where model_make_id = '"+make+"' and model_name = '"+model+"' order by model_year DESC "
+
+        cursor = connection.cursor()
+        cursor.execute(sql_select_Query)
+
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+        allVariants = []
+        for row in records:
+            allVariants.append(Variant(row[1], row[0]))
+        return allVariants
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
+def listAllFields():
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
                                   database="daft")
     try:
@@ -384,7 +500,7 @@ def listCriteria():
         for row in records:
             listOfCriteria.append(Criteria(row[0], row[1], row[2]))
 
-        return json.dumps([ob.__dict__ for ob in listOfCriteria])
+        return listOfCriteria
     except (Exception, psycopg2.Error) as error:
         print("Error reading data from MySQL table", error)
     finally:
@@ -393,6 +509,21 @@ def listCriteria():
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
+
+@app.route('/car/variants', methods=['GET'])
+def getVarian():
+    make = request.args.get('make')
+    model = request.args.get('model')
+    # return json.dumps(foundItems(key))
+    return json.dumps([ob.__dict__ for ob in getVariants(make, model)])
+
+@app.route('/criteria', methods=['GET'])
+def listCriteria():
+    return json.dumps([ob.__dict__ for ob in listAllFields()]);
+
+@app.route('/car/fields/descriptions', methods=['GET'])
+def getdescription():
+    return json.dumps([ob.__dict__ for ob in listAllFields()]);
 
 
 
