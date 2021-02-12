@@ -157,7 +157,7 @@ def insertLink(carsRequest, rankCriteria, rank_json, versus, category):
         postgres_insert_query += " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s , %s )"
 
         url = "/compare/" + category + "/" + str(number[0]) + "/" + versus
-        record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, '', '', '', '{}', url,)
+        record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, versus, versus, versus, '{}', url,)
 
         # print("LInk Query", postgres_insert_query)
         cursor.execute(postgres_insert_query, record_to_insert)
@@ -532,6 +532,55 @@ def listCriteria():
 def getdescription():
     return json.dumps([ob.__dict__ for ob in listAllFields()]);
 
+
+def recentComparisons(type):
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+
+        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where display_text != '' order by id desc LIMIT 20 "
+
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+        linkInfo = []
+        for row in records:
+            splittedTitle = row[4].split("-")
+            if len(splittedTitle) > 0:
+                title = splittedTitle[0]
+                name = row[4]
+                link = row[8]
+                try:
+                    # title exists
+                    filter = list(filter(lambda f: (f["title"] == title), linkInfo))
+                    if filter:
+                        for i in range(len(linkInfo)):
+                            temp = linkInfo[i]
+                            temp = linkInfo[i]
+                            if temp["title"] == title:
+                                tempResources = temp["resources"]
+                                tempResources.append({"name":name, "link":link})
+                                temp["resources"] = tempResources
+                            linkInfo[i] = temp
+                except (Exception) as error:
+                    # title does not exists
+                    linkInfo.append({"title":title, "resources":[{"name":name, "link":link}]})
+
+        return linkInfo
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
+@app.route('/car/recent/comparisons', methods=['GET'])
+def getRecentComparisons():
+    comparisons = recentComparisons("cars");
+    return json.dumps([ob for ob in comparisons]);
 
 
 
