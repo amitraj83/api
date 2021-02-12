@@ -175,7 +175,7 @@ def insertLink(carsRequest, rankCriteria, rank_json, versus, category):
 
 
 
-@app.route('/compare/cars', methods=['POST'])
+@app.route('/api/compare/cars', methods=['POST'])
 def compareCars():
 
     if not request.data :
@@ -350,13 +350,13 @@ def getLinkData(key):
             print("PostgreSQL connection is closed")
 
 
-@app.route('/links/information', methods=['GET'])
+@app.route('/api/links/information', methods=['GET'])
 def getLinkInformation():
     linkNumber = request.args.get('linkNumber')
     data = getLinkData(linkNumber)
     return data.toJSON()
 
-@app.route('/list/cars', methods=['GET'])
+@app.route('/api/list/cars', methods=['GET'])
 def listCarsAPI():
     key = request.args.get('key')
     # return json.dumps(foundItems(key))
@@ -391,7 +391,7 @@ def getCarDetails(id):
             print("PostgreSQL connection is closed")
 
 
-@app.route('/car/details', methods=['GET'])
+@app.route('/api/car/details', methods=['GET'])
 def getCar():
     id = request.args.get('id')
     # return json.dumps(foundItems(key))
@@ -453,13 +453,13 @@ def getMakesForAModel(key):
 
 
 
-@app.route('/car/makes', methods=['GET'])
+@app.route('/api/car/makes', methods=['GET'])
 def getMakes():
 
     # return json.dumps(foundItems(key))
     return json.dumps([ob.__dict__ for ob in getAllMakes()])
 
-@app.route('/car/models', methods=['GET'])
+@app.route('/api/car/models', methods=['GET'])
 def getModels():
     make = request.args.get('make')
     # return json.dumps(foundItems(key))
@@ -517,18 +517,18 @@ def listAllFields():
             connection.close()
             print("PostgreSQL connection is closed")
 
-@app.route('/car/variants', methods=['GET'])
+@app.route('/api/car/variants', methods=['GET'])
 def getVarian():
     make = request.args.get('make')
     model = request.args.get('model')
     # return json.dumps(foundItems(key))
     return json.dumps([ob.__dict__ for ob in getVariants(make, model)])
 
-@app.route('/criteria', methods=['GET'])
+@app.route('/api/criteria', methods=['GET'])
 def listCriteria():
     return json.dumps([ob.__dict__ for ob in listAllFields()]);
 
-@app.route('/car/fields/descriptions', methods=['GET'])
+@app.route('/api/car/fields/descriptions', methods=['GET'])
 def getdescription():
     return json.dumps([ob.__dict__ for ob in listAllFields()]);
 
@@ -564,6 +564,7 @@ def recentComparisons(type):
                             linkInfo[i] = temp
                 except (Exception) as error:
                     # title does not exists
+
                     linkInfo.append({"title":title, "resources":[{"name":name, "link":link}]})
 
         return linkInfo
@@ -577,7 +578,7 @@ def recentComparisons(type):
             print("PostgreSQL connection is closed")
 
 
-@app.route('/car/recent/comparisons', methods=['GET'])
+@app.route('/api/car/recent/comparisons', methods=['GET'])
 def getRecentComparisons():
     comparisons = recentComparisons("cars");
     return json.dumps([ob for ob in comparisons]);
