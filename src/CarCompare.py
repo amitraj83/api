@@ -196,14 +196,6 @@ def compareCars():
         vid3 = str(carsRequest[2])
 
     data = compareData(vid1, vid2, vid3)
-    #return json.dumps([ob.__dict__ for ob in data]) json.loads(request.data)['criteria']
-    #len(json.loads(request.data)['criteria'][0]) = 3
-    #json.loads(request.data)['criteria'][0][0]
-    #json.loads(request.data)['criteria'][0][1]
-    #json.loads(request.data)['criteria'][0][2]
-    #len(json.loads(request.data)['cars']) = 3
-    #json.loads(request.data)['cars'][1]
-    #json.loads(request.data)['cars'][0]
 
     if data:
         allData = []
@@ -404,16 +396,16 @@ def getAllMakes():
                                   database="daft")
     try:
         cursor = connection.cursor()
-        sql_select_Query = " select model_make_id, model_make_display from cars.car group by model_make_id, model_make_display "
+        sql_select_Query = " select model_make_id, model_make_display from cars.car group by model_make_id, model_make_display order by model_make_display "
 
         cursor = connection.cursor()
         cursor.execute(sql_select_Query)
 
         cursor.execute(sql_select_Query)
         records = cursor.fetchall()
-        allMakes = []
+        allMakes = set()
         for row in records:
-            allMakes.append(Make(row[0], row[1]))
+            allMakes.add(Make(row[0], row[1]))
         return allMakes
     except (Exception, psycopg2.Error) as error:
         print("Error reading data from MySQL table", error)
