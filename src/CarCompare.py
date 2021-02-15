@@ -545,20 +545,26 @@ def recentComparisons(type):
                 link = row[8]
                 try:
                     # title exists
-                    filter = list(filter(lambda f: (f["title"] == title), linkInfo))
-                    if filter:
-                        for i in range(len(linkInfo)):
-                            temp = linkInfo[i]
-                            temp = linkInfo[i]
-                            if temp["title"] == title:
-                                tempResources = temp["resources"]
+
+                    if len(linkInfo) == 0:
+                        linkInfo.append({"title": title, "resources": [{"name": name, "link": link}]})
+                        continue
+                    titleAlreadyExists = False
+                    for i in range(len(linkInfo)):
+                        temp = linkInfo[i]
+                        temp = linkInfo[i]
+                        if temp["title"] == title:
+                            tempResources = temp["resources"]
+                            if len(tempResources) < 5:
                                 tempResources.append({"name":name, "link":link})
                                 temp["resources"] = tempResources
-                            linkInfo[i] = temp
+                                linkInfo[i] = temp
+                            titleAlreadyExists = True
+                    if not titleAlreadyExists and len(linkInfo) < 5:
+                            linkInfo.append({"title": title, "resources": [{"name": name, "link": link}]})
                 except (Exception) as error:
                     # title does not exists
-
-                    linkInfo.append({"title":title, "resources":[{"name":name, "link":link}]})
+                    print(error)
 
         return linkInfo
     except (Exception, psycopg2.Error) as error:
