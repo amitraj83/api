@@ -319,14 +319,14 @@ def getLinkData(key):
             for row in records:
                 carDetails = []
                 listofId = str(row[1]).replace("[", "(").replace("]",")")
-                carsQuery = " select model_id, model_make_id, model_name, model_trim, model_year, model_body, model_engine_position, model_engine_cc, model_engine_cyl, model_engine_type, model_engine_valves_per_cyl, model_engine_power_ps, model_engine_power_rpm, model_engine_torque_nm, model_engine_torque_rpm, model_engine_bore_mm, model_engine_stroke_mm, model_engine_compression, model_engine_fuel, model_top_speed_kph, model_0_to_100_kph, model_drive, model_transmission_type, model_seats, model_doors, model_weight_kg, model_length_mm, model_width_mm, model_height_mm, model_wheelbase_mm, model_lkm_hwy, model_lkm_mixed, model_lkm_city, model_fuel_cap_l, model_sold_in_us, model_co2, model_make_display from cars.car where model_id in "+listofId
+                carsQuery = " select model_id, model_make_id, model_name, model_trim, model_year, model_body, model_engine_position, model_engine_cc, model_engine_cyl, model_engine_type, model_engine_valves_per_cyl, model_engine_power_ps, model_engine_power_rpm, model_engine_torque_nm, model_engine_torque_rpm, model_engine_bore_mm, model_engine_stroke_mm, model_engine_compression, model_engine_fuel, model_top_speed_kph, model_0_to_100_kph, model_drive, model_transmission_type, model_seats, model_doors, model_weight_kg, model_length_mm, model_width_mm, model_height_mm, model_wheelbase_mm, model_lkm_hwy, model_lkm_mixed, model_lkm_city, model_fuel_cap_l, model_sold_in_us, model_co2, model_make_display, image from cars.car where model_id in "+listofId
                 cursor2.execute(carsQuery)
                 carRecords = cursor2.fetchall()
                 for carRow in carRecords:
                     carDetails.append(Car(carRow[0], carRow[1], carRow[2], carRow[3], carRow[4], carRow[5], carRow[6], carRow[7], carRow[8], carRow[9], carRow[10], carRow[11],
                     carRow[12], carRow[13], carRow[14], carRow[15], carRow[16], carRow[17], carRow[18], carRow[19], carRow[20], carRow[21], carRow[22],
                     carRow[23], carRow[24], carRow[25], carRow[26], carRow[27], carRow[28], carRow[29], carRow[30], carRow[31], carRow[32], carRow[33],
-                    carRow[34], carRow[35], carRow[36]))
+                    carRow[34], carRow[35], carRow[36], carRow[37]))
                 newCarDetails = json.dumps([ob.__dict__ for ob in carDetails])
                 if not newCarDetails:
                     newCarDetails = row[3]
