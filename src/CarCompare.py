@@ -397,16 +397,16 @@ def getAllMakes():
                                   database="daft")
     try:
         cursor = connection.cursor()
-        sql_select_Query = " select model_make_id, model_make_display from cars.car group by model_make_id, model_make_display order by model_make_display "
+        sql_select_Query = " select distinct model_make_id from cars.car where model_trim != '' order by model_make_id "
 
         cursor = connection.cursor()
         cursor.execute(sql_select_Query)
 
-        cursor.execute(sql_select_Query)
+        # cursor.execute(sql_select_Query)
         records = cursor.fetchall()
-        allMakes = set()
+        allMakes = []
         for row in records:
-            allMakes.add(Make(row[0], row[1]))
+            allMakes.append(Make(row[0], row[0].title()))
         return allMakes
     except (Exception, psycopg2.Error) as error:
         print("Error reading data from MySQL table", error)
@@ -424,15 +424,15 @@ def getMakesForAModel(key):
     try:
         cursor = connection.cursor()
         # sql_select_Query = " select  distinct model_name from cars.car where model_make_id = '"+key+"' "
-        sql_select_Query = " select  distinct (model_name || ' (' || model_year || ')') as modelName, model_name, model_year from cars.car where model_make_id ILIKE '"+key+"' order by model_year DESC "
+        sql_select_Query = " select  distinct (model_name || ' (' || model_year || ')') as modelName, model_name, model_year from cars.car where model_make_id ILIKE '"+key+"' and model_trim != '' order by model_year DESC "
         cursor = connection.cursor()
         cursor.execute(sql_select_Query)
 
-        cursor.execute(sql_select_Query)
+        # cursor.execute(sql_select_Query)
         records = cursor.fetchall()
         allModels = []
         for row in records:
-            allModels.append(Model(row[1], row[0]))
+            allModels.append(Model(row[1]+"$"+str(row[2]), row[0]))
         return allModels
     except (Exception, psycopg2.Error) as error:
         print("Error reading data from MySQL table", error)
@@ -464,10 +464,12 @@ def getVariants(make, model):
                                   database="daft")
     try:
         cursor = connection.cursor()
-        sql_select_Query = " select model_trim, model_id, model_year  from cars.car where model_make_id = '"+make+"' and model_name = '"+model+"' order by model_year DESC "
+        splittedModelYear = model.split("$")
+        year = int(splittedModelYear[1])
+        model = str(splittedModelYear[0])
+        sql_select_Query = " select model_trim, model_id, model_year  from cars.car where model_make_id = '"+make+"' and model_name = '"+model+"' and model_year = "+str(year)+" and model_trim != '' order by model_year DESC "
 
         cursor = connection.cursor()
-        cursor.execute(sql_select_Query)
 
         cursor.execute(sql_select_Query)
         records = cursor.fetchall()
