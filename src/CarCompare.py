@@ -126,7 +126,7 @@ def compareData(vid1, vid2, vid3):
         cursor = connection.cursor()
         cursor.execute(sql_select_Query)
 
-        cursor.execute(sql_select_Query)
+        # cursor.execute(sql_select_Query)
         records = cursor.fetchall()
         listOfCars = []
         for row in records:
