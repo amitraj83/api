@@ -1,0 +1,58 @@
+URL: compare-link-number/{top rank cars make+model+year}
+title: Three car names with hyphen
+<meta  data-react-helmet="true"  name="description" content="Compare three cars side by side and rank them according to your preferences. Compare car specs and find out the best car for you. User our free car comparison tool." />
+<meta  data-react-helmet="true"  name="theme-color" content="#1a2e3c"/>
+<meta  data-react-helmet="true"  property="og:type" content="website"/>
+<meta  data-react-helmet="true"  property="og:site_name" content={pageTitle}/>
+<meta  data-react-helmet="true"  name="og:image" property="og:image" content=""/>
+<meta  data-react-helmet="true"  name="title" content={pageTitle}/>
+<meta  data-react-helmet="true"  property="og:title" content={pageTitle}/>
+<meta  data-react-helmet="true"  property="og:url" content={pageURL}/>
+<meta  data-react-helmet="true"  property="og:description" content={description}/>
+<meta  data-react-helmet="true"  name="keywords" content="{carname1}, {carname2}, {carname3}, car compare 3 cars, car compare side by side, compare compare site, car compare tool, car compare spec, compare car prices uk, car comparison europe, car performance comparison, car compare usa, car compare india"/>
+<meta  data-react-helmet="true"  name="robots" content="index,follow"/>
+
+
+
+
+<h1>Title</h1>
+
+<table of 3 ranks with * on the top and images>
+
+{Buying a car is always tricky. | When you are going to buy a new car or used cars, taking the right decision is very complicated. | With so many cars in the market, its very difficult to find the best car for you.}
+{In this blog, we will compare {car1}, {car2} and {car3}, and find out which one is good and why? | Today, we are going to compare {car1}, {car2} and {car3} to checkout which one suits best to your needs and why?| Lets compare {car1}, {car2} and {car3} and find out which car you should buy and why?}
+
+{The criteria used to compare and rank the cars is | To compare and rank the cars, the criteia used are | Following criteria was used to compare and rank them to find the best car}
+
+Bullet POints:
+1. More the {criteria}, better it is. (Not at all important -1, Slightly important - 2, Important -3, Fairly Important -4, Very important -5) | Lesser the {criteria}, better it is.
+
+
+For each criteria {
+When we compare {criteria}, we found that {car1} has {criteria-value} {criteria}, {car2} has {criteria-value} {criteia} and {car3} has {criteria-value}{criteria}. |
+Firstly, we are considering the criteria {criteria} of {car1}, {car2} and {car3} and they have {criteria-value} {criteia}, {criteria-value} {criteia} and {criteria-value} {criteia}, respectively. |
+Lets review {criteria} of each car where {car1} has {criteria-value} {criteria}, {car2} has {criteria-value} {criteia} and {car3} has {criteria-value}{criteria}.
+
+Because given preference is {lower the better}|{higher the better}, it comes out that {car with rank 1} is the best because it has {criteria} {criteria value} which {highest|lowest} from others. And because
+you have mentioned that {criteria} is {Not at all important|...}, its {car with rank 1's} weighted rank is {weighted rank of car 1} where as weighted rank of {car with rank 2} is {weighted rank of car 2}
+and weighted rank of {car with rank 3} is {weighted rank of car 3}.|
+When we compared {criteria} of {car with rank 1} with that of others, we found that {car with rank 1} stands best. It is because the mentioned criteria {criteia} value is {highest if higher the better| lowest if lower the better}
+as compared to that of {car with rank 2} and {car with rank 3}. Given that {criteria} is {faily important|....}, the weighted rank of {car with rank 1} is {rank of car 1} which is better than the weighted ranks of {cars with rank 2} and {cars with rank 3}.
+|
+
+}
+
+In the end, we calculate the final rank of cars by adding all the weighted ranks of each criteria. So, finally, {car with rank 1} stands out to be the best one becuase your important 
+criteria are best matched in this car. |
+After evaluating all criteria among all cars, we found that {car with rank 1} seems to be the best suited for your needs as compared to {car with rank 2} and {car with rank 3}. |
+In conclusion, our verdict is that the car {car with rank 1} is the best cars because it stands best when compared with other cars, according to your criteria.
+
+
+
+
+
+
+
+
+
+

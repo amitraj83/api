@@ -142,7 +142,7 @@ def compareData(vid1, vid2, vid3):
             print("PostgreSQL connection is closed")
 
 
-def insertLink(carsRequest, rankCriteria, rank_json, versus, category):
+def insertLink(carsRequest, rankCriteria, rank_json, versus, category, all_ranks_json):
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
                                   database="daft")
     number = None
@@ -158,9 +158,10 @@ def insertLink(carsRequest, rankCriteria, rank_json, versus, category):
         postgres_insert_query += " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s , %s )"
 
         url = "/compare/" + category + "/" + str(number[0]) + "/" + versus
-        record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, versus, versus, versus, '{}', url,)
+        otherData = {"rank_data":json.loads(all_ranks_json)}
+        record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, versus, versus, versus, json.dumps((otherData)), url,)
 
-        # print("LInk Query", postgres_insert_query)
+
         cursor.execute(postgres_insert_query, record_to_insert)
 
         return url
@@ -264,7 +265,7 @@ def compareCars():
                 dash = ""
             versus += cars_ranks['model_make_display'][i]+"-"+cars_ranks['model_name'][i]+"-"+str(int(cars_ranks['model_year'][i]))+dash
         #cars_ranks['model_make_display'][0]+"-"+cars_ranks['model_name'][0]+"-"+str(int(cars_ranks['model_year'][0]))
-        pushUrl = insertLink(carsRequest, rankCriteria[0] if rankCriteria else None, rank_json, versus, "cars")
+        pushUrl = insertLink(carsRequest, rankCriteria[0] if rankCriteria else None, rank_json, versus, "cars", cars.to_json())
         return {"cars_ranks":cars_ranks.to_json(), "pushUrl":pushUrl}
         # return json.dumps([ob.__dict__ for ob in data])
     else:
