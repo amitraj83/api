@@ -92,6 +92,76 @@ class Variant:
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 
+defaultCriteria = {
+  "criteria": [
+    [
+      {
+        "id": 880,
+        "col_name": "model_year",
+        "displayname": "Model Year",
+        "preference": "False",
+        "importance": "5"
+      },
+      {
+        "id": 8900,
+        "col_name": "model_engine_cc",
+        "displayname": "Engine size (cc)",
+        "preference": "False",
+        "importance": "5"
+      },
+      {
+        "id": 6294,
+        "col_name": "model_engine_cyl",
+        "displayname": "Engine Cylinder",
+        "preference": "False",
+        "importance": "3"
+      },
+      {
+        "id": 367,
+        "col_name": "model_engine_power_rpm",
+        "displayname": "Engine power (rpm)",
+        "preference": "False",
+        "importance": "2"
+      },
+      {
+        "id": 8245,
+        "col_name": "model_engine_torque_rpm",
+        "displayname": "Engine Torque (rpm)",
+        "preference": "False",
+        "importance": "2"
+      },
+      {
+        "id": 1234,
+        "col_name": "model_seats",
+        "displayname": "Seats",
+        "preference": "True",
+        "importance": "4"
+      },
+      {
+        "id": 4567,
+        "col_name": "model_doors",
+        "displayname": "Doors",
+        "preference": "True",
+        "importance": "3"
+      },
+      {
+        "id": 765,
+        "col_name": "model_width_mm",
+        "displayname": "Width (mm)",
+        "preference": "True",
+        "importance": "5"
+      },
+      {
+        "id": 3756,
+        "col_name": "model_height_mm",
+        "displayname": "Height (mm)",
+        "preference": "True",
+        "importance": "5"
+      }
+    ]
+  ]
+  
+}
 
 class LinkInformation:
     def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data, url, carDetails):
@@ -208,50 +278,57 @@ def compareCars():
         cars = pd.DataFrame(allData)
 
         totalWgt = 0
-        if rankCriteria:
-            for i in range(len(rankCriteria[0])):
-                cars['rnk_'+rankCriteria[0][i]['col_name']] = cars[rankCriteria[0][i]['col_name']].rank(ascending=(rankCriteria[0][i]['preference'] == "True"))
-                totalWgt += int(rankCriteria[0][0]['importance'])
-            if totalWgt != 0:
-                for i in range(len(rankCriteria[0])):
-                    cars['wgt_' + rankCriteria[0][i]['col_name']] = int(rankCriteria[0][i]['importance']) / totalWgt
-            rankConsolidate = 0
-            for i in range(len(rankCriteria[0])):
-                rankConsolidate += cars['rnk_' + rankCriteria[0][i]['col_name']] * cars[
-                    'wgt_' + rankCriteria[0][i]['col_name']]
-            cars['rnk_consolidate'] = rankConsolidate
+        criteria = []
+
+        if len(rankCriteria) > 0:
+            criteria = rankCriteria[0]
         else:
-            cars['rnk_model_year'] = cars['model_year'].rank(ascending=False)
-            cars['rnk_model_engine_cc'] = cars['model_engine_cc'].rank(ascending=False)
-            cars['rnk_model_engine_cyl'] = cars['model_engine_cyl'].rank(ascending=False)
-            cars['rnk_model_engine_power_rpm'] = cars['model_engine_power_rpm'].rank(ascending=False)
-            cars['rnk_model_engine_torque_rpm'] = cars['model_engine_torque_rpm'].rank(ascending=False)
-            cars['rnk_model_seats'] = cars['model_seats'].rank(ascending=False)
-            cars['rnk_model_doors'] = cars['model_doors'].rank(ascending=False)
-            cars['rnk_model_width_mm'] = cars['model_width_mm'].rank(ascending=False)
-            cars['rnk_model_height_mm'] = cars['model_height_mm'].rank(ascending=False)
-
-            cars['wgt_model_year'] = 0.3
-            cars['wgt_model_engine_cc'] = 0.1
-            cars['wgt_model_engine_cyl'] = 0.05
-            cars['wgt_model_engine_power_rpm'] = 0.05
-            cars['wgt_model_engine_torque_rpm'] = 0.05
-            cars['wgt_model_seats'] = 0.2
-            cars['wgt_model_doors'] = 0.1
-            cars['wgt_model_width_mm'] = 0.1
-            cars['wgt_model_height_mm'] = 0.1
-
-            model_year_Consilidate = cars['rnk_model_year'] * cars['wgt_model_year']
-            model_engine_cc_Consolidate = cars['rnk_model_engine_cc'] * cars['wgt_model_engine_cc']
-            model_engine_cyl_Consolidate = cars['rnk_model_engine_cyl'] * cars['wgt_model_engine_cyl']
-            model_engine_power_rpm_Consolidate = cars['rnk_model_engine_power_rpm'] * cars['wgt_model_engine_power_rpm']
-            model_engine_torque_rpm_Consolidate = cars['rnk_model_engine_torque_rpm'] * cars['wgt_model_engine_torque_rpm']
-            model_seats_Consolidate = cars['rnk_model_seats'] * cars['wgt_model_seats']
-            model_doors_Consolidate = cars['rnk_model_doors'] * cars['wgt_model_doors']
-            model_width_mm_Consolidate = cars['rnk_model_width_mm'] * cars['wgt_model_width_mm']
-            model_height_mm_Consolidate = cars['rnk_model_height_mm'] * cars['wgt_model_height_mm']
-
-            cars['rnk_consolidate'] = model_year_Consilidate + model_engine_cc_Consolidate + model_engine_cyl_Consolidate + model_engine_power_rpm_Consolidate + model_engine_torque_rpm_Consolidate + model_seats_Consolidate + model_doors_Consolidate + model_width_mm_Consolidate + model_height_mm_Consolidate
+            criteria = defaultCriteria["criteria"][0]
+            
+        for i in range(len(criteria)):
+            cars['rnk_'+criteria[i]['col_name']] = cars[criteria[i]['col_name']].rank(ascending=(criteria[i]['preference'] == "True"))
+            totalWgt += int(criteria[0]['importance'])
+        if totalWgt != 0:
+            for i in range(len(criteria)):
+                cars['wgt_' + criteria[i]['col_name']] = int(criteria[i]['importance']) / totalWgt
+        rankConsolidate = 0
+        for i in range(len(criteria)):
+            rankConsolidate += cars['rnk_' + criteria[i]['col_name']] * cars[
+                'wgt_' + criteria[i]['col_name']]
+        cars['rnk_consolidate'] = rankConsolidate
+        # else:
+        #
+        #     cars['rnk_model_year'] = cars['model_year'].rank(ascending=False)
+        #     cars['rnk_model_engine_cc'] = cars['model_engine_cc'].rank(ascending=False)
+        #     cars['rnk_model_engine_cyl'] = cars['model_engine_cyl'].rank(ascending=False)
+        #     cars['rnk_model_engine_power_rpm'] = cars['model_engine_power_rpm'].rank(ascending=False)
+        #     cars['rnk_model_engine_torque_rpm'] = cars['model_engine_torque_rpm'].rank(ascending=False)
+        #     cars['rnk_model_seats'] = cars['model_seats'].rank(ascending=False)
+        #     cars['rnk_model_doors'] = cars['model_doors'].rank(ascending=False)
+        #     cars['rnk_model_width_mm'] = cars['model_width_mm'].rank(ascending=False)
+        #     cars['rnk_model_height_mm'] = cars['model_height_mm'].rank(ascending=False)
+        #
+        #     cars['wgt_model_year'] = 0.3
+        #     cars['wgt_model_engine_cc'] = 0.1
+        #     cars['wgt_model_engine_cyl'] = 0.05
+        #     cars['wgt_model_engine_power_rpm'] = 0.05
+        #     cars['wgt_model_engine_torque_rpm'] = 0.05
+        #     cars['wgt_model_seats'] = 0.2
+        #     cars['wgt_model_doors'] = 0.1
+        #     cars['wgt_model_width_mm'] = 0.1
+        #     cars['wgt_model_height_mm'] = 0.1
+        #
+        #     model_year_Consilidate = cars['rnk_model_year'] * cars['wgt_model_year']
+        #     model_engine_cc_Consolidate = cars['rnk_model_engine_cc'] * cars['wgt_model_engine_cc']
+        #     model_engine_cyl_Consolidate = cars['rnk_model_engine_cyl'] * cars['wgt_model_engine_cyl']
+        #     model_engine_power_rpm_Consolidate = cars['rnk_model_engine_power_rpm'] * cars['wgt_model_engine_power_rpm']
+        #     model_engine_torque_rpm_Consolidate = cars['rnk_model_engine_torque_rpm'] * cars['wgt_model_engine_torque_rpm']
+        #     model_seats_Consolidate = cars['rnk_model_seats'] * cars['wgt_model_seats']
+        #     model_doors_Consolidate = cars['rnk_model_doors'] * cars['wgt_model_doors']
+        #     model_width_mm_Consolidate = cars['rnk_model_width_mm'] * cars['wgt_model_width_mm']
+        #     model_height_mm_Consolidate = cars['rnk_model_height_mm'] * cars['wgt_model_height_mm']
+        #
+        #     cars['rnk_consolidate'] = model_year_Consilidate + model_engine_cc_Consolidate + model_engine_cyl_Consolidate + model_engine_power_rpm_Consolidate + model_engine_torque_rpm_Consolidate + model_seats_Consolidate + model_doors_Consolidate + model_width_mm_Consolidate + model_height_mm_Consolidate
 
 
         cars['rnk_consolidate_final'] = cars['rnk_consolidate'].rank()
@@ -265,7 +342,7 @@ def compareCars():
                 dash = ""
             versus += cars_ranks['model_make_display'][i]+"-"+cars_ranks['model_name'][i]+"-"+str(int(cars_ranks['model_year'][i]))+dash
         #cars_ranks['model_make_display'][0]+"-"+cars_ranks['model_name'][0]+"-"+str(int(cars_ranks['model_year'][0]))
-        pushUrl = insertLink(carsRequest, rankCriteria[0] if rankCriteria else None, rank_json, versus, "cars", cars.to_json())
+        pushUrl = insertLink(carsRequest, criteria, rank_json, versus, "cars", cars.to_json())
         return {"cars_ranks":cars_ranks.to_json(), "pushUrl":pushUrl}
         # return json.dumps([ob.__dict__ for ob in data])
     else:
@@ -488,6 +565,32 @@ def getVariants(make, model):
             print("PostgreSQL connection is closed")
 
 
+def getAllBlogLinks():
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+        sql_select_Query = " select htmlblog, display_text from cars.car_links where htmlblog != '' and display_text != '' order by id desc   "
+
+        cursor = connection.cursor()
+
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+        listOfBlogs = []
+        for row in records:
+            listOfBlogs.append({"link":row[0], "displayText":row[1]})
+
+        return listOfBlogs
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
 def listAllFields():
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
                                   database="daft")
@@ -535,7 +638,7 @@ def recentComparisons(type):
     try:
         cursor = connection.cursor()
 
-        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where display_text != '' order by id desc LIMIT 20 "
+        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where display_text != '' order by random() desc LIMIT 20 "
 
         cursor.execute(sql_select_Query)
         records = cursor.fetchall()
@@ -585,7 +688,18 @@ def getRecentComparisons():
     comparisons = recentComparisons("cars");
     return json.dumps([ob for ob in comparisons]);
 
+@app.route('/api/car/criteria/default', methods=['GET'])
+def getDefaultCriteria():
 
+    return json.dumps(defaultCriteria["criteria"][0]);
+
+
+
+
+@app.route('/api/car/blogs/links', methods=['GET'])
+def getBlogsLInks():
+
+    return json.dumps(getAllBlogLinks());
 
 
 

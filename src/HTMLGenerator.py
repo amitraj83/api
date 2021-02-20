@@ -1,9 +1,12 @@
 import os
+import os.path
+from os import path
 from string import Template
 import urllib
 import urllib.parse
 import psycopg2
 import json
+import datetime
 
 jsonTemplate = {}
 
@@ -73,7 +76,7 @@ def getCar(id):
             connection.commit()
             cursor.close()
             connection.close()
-            print("PostgreSQL connection is closed")
+            # print("PostgreSQL connection is closed")
 
 def getRelatedLinks(listOfKeys):
     if len(listOfKeys) > 0:
@@ -102,11 +105,12 @@ def getRelatedLinks(listOfKeys):
                 connection.commit()
                 cursor.close()
                 connection.close()
-                print("PostgreSQL connection is closed")
+                # print("PostgreSQL connection is closed")
 
 def main():
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
                                   database="daft")
+    count = 0
     try:
         cursor = connection.cursor()
         sqlQuery = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url  FROM cars.car_links "
@@ -159,7 +163,7 @@ def main():
                         aCar = carIDMap.get(carId)
                         carName = aCar.model_make_display +" "+aCar.model_name+" ("+str(aCar.model_year)+") "
                         rankCars[str(rank)] = carName
-                        # TODO, rank is not always 1
+
                         if rank == int(min(row[3]['rnk_consolidate_final'].values())):
                             jsonTemplate["stars_car1"] = "<i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i>"
                             jsonTemplate["image_car1"] = aCar.image
@@ -202,7 +206,7 @@ def main():
                         colName = criteria[i]["col_name"]
                         pref = "Lower the better"
                         localHighestLowest = "Lowest"
-                        if criteria[0]["preference"].lower() == "false":
+                        if criteria[i]["preference"].lower() == "false":
                             pref = "Higher the better"
                             localHighestLowest = "Highest"
                         importance = importanceArray[int(criteria[0]["importance"]) - 1]
@@ -257,17 +261,32 @@ def main():
                     jsonTemplate["footer_links"] = footerLinks
                     substitutedData = template.substitute(jsonTemplate)
 
+
+                    blodDir = "../../ui-app/public/blogs/"
+                    if not os.path.exists(blodDir):
+                        os.makedirs(blodDir)
+
+
                     rank1CarMake = urllib.parse.quote(rank1Car.model_make_display)
-                    if not os.path.exists(rank1CarMake):
-                        os.makedirs(rank1CarMake)
+                    if not os.path.exists(blodDir+rank1CarMake):
+                        os.makedirs(blodDir+rank1CarMake)
 
                     # print(str(substitutedData))
-                    newFile = open(rank1CarMake+"/"+str(row[0])+".html", "x")
-                    newFile.write(str(substitutedData))
-                    f.close()
-                    newFile.close()
+                    blogPath = "/blogs/"+rank1CarMake+"/"+str(row[0])+".html"
+                    fileName = "../../ui-app/public"+blogPath
+                    # print(fileName)
+                    if not path.exists(fileName):
+                        dt = datetime.datetime.now().isoformat()
+                        newFile = open(fileName, "x")
+                        newFile.write(str(substitutedData))
+                        htmlBlogQuery = " UPDATE cars.car_links SET  htmlblog='"+blogPath+"' WHERE id = "+str(row[0])+" ; "
+                        cursor.execute(htmlBlogQuery)
+                        count += 1
+                        print("generate: " + str(count))
+                        f.close()
+                        newFile.close()
 
-
+        print("Total Generated: "+str(count))
     except (Exception, psycopg2.Error) as error:
         print("Error:", error)
     finally:
@@ -275,7 +294,7 @@ def main():
             connection.commit()
             cursor.close()
             connection.close()
-            print("PostgreSQL connection is closed")
+            # print("PostgreSQL connection is closed")
 
 
 if __name__ == "__main__":
