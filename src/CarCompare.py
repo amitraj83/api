@@ -5,9 +5,26 @@ import json
 import datetime
 import numpy as np
 import pandas as pd
+import os
+import os.path
+from os import path
+
+from string import Template
+import urllib
+import urllib.parse
+import psycopg2
+import json
+import datetime
+
+
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+
+jsonTemplate = {}
+
+importanceArray = ["at all important", "Slightly important", "Important", "Fairly Important", "Very important"]
+
 
 
 class Car:
@@ -212,6 +229,240 @@ def compareData(vid1, vid2, vid3):
             print("PostgreSQL connection is closed")
 
 
+def getCar(id):
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+        sqlQuery = " select model_id, model_make_id, model_name, model_trim, model_year, model_body, model_engine_position, model_engine_cc, model_engine_cyl, model_engine_type, model_engine_valves_per_cyl, model_engine_power_ps, model_engine_power_rpm, model_engine_torque_nm, model_engine_torque_rpm, model_engine_bore_mm, model_engine_stroke_mm, model_engine_compression, model_engine_fuel, model_top_speed_kph, model_0_to_100_kph, model_drive, model_transmission_type, model_seats, model_doors, model_weight_kg, model_length_mm, model_width_mm, model_height_mm, model_wheelbase_mm, model_lkm_hwy, model_lkm_mixed, model_lkm_city, model_fuel_cap_l, model_sold_in_us, model_co2, model_make_display, image from cars.car where model_id = "+str(id) +" ; "
+        cursor.execute(sqlQuery)
+        records = cursor.fetchall()
+        for row in records:
+            return Car(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33], row[34], row[35], row[36], row[37])
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            # print("PostgreSQL connection is closed")
+
+
+def getRelatedLinks(listOfKeys):
+    if len(listOfKeys) > 0:
+        connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                      database="daft")
+        try:
+            cursor = connection.cursor()
+            sqlQuery = " select display_text, url from cars.car_links where "
+            OR = " or "
+            for i in range(len(listOfKeys)):
+                if i == len(listOfKeys)-1:
+                    OR = "  "
+                key = listOfKeys[i]
+                sqlQuery += " url ilike '%"+key+"%' " + OR
+            sqlQuery += " order by id desc LIMIT 5  "
+            cursor.execute(sqlQuery)
+            records = cursor.fetchall()
+            results = []
+            for row in records:
+                results.append({"url":row[1],"displayText":row[0]})
+            return results
+        except (Exception, psycopg2.Error) as error:
+            print("Error reading data from MySQL table", error)
+        finally:
+            if (connection):
+                connection.commit()
+                cursor.close()
+                connection.close()
+                # print("PostgreSQL connection is closed")
+
+
+def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_title, other_data, url):
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    count = 0
+    try:
+        cursor = connection.cursor()
+        row = [id, car_ids, criteria, json.loads(response), display_text, summary, page_title, other_data, url]
+
+        # sqlQuery = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url  FROM cars.car_links where id = "+linkId
+        # cursor.execute(sqlQuery)
+        # records = cursor.fetchall()
+        # for row in records:
+
+        with open('../doc/blog-template.json', 'r') as tf:
+            jsonTemplate = json.loads(tf.read())
+
+
+        if len(row[7]) > 0 and ('rank_data' in row[7].keys()):
+            car1 = getCar(row[1][0])
+            car2 = getCar(row[1][1])
+            car3 = getCar(row[1][2])
+            carIDMap = {row[1][0]:car1,row[1][1]:car2,row[1][2]:car3}
+
+
+
+            with open('../doc/template.html', 'r') as f:
+                data = f.read()
+                template = Template(data)
+                jsonTemplate["title"] = row[6]
+                jsonTemplate["pageURL"] = urllib.parse.quote(row[8])
+                jsonTemplate["keywords"] = "Compare Car side by side, car comparison tool, "
+                description = "Compare "
+                if car1:
+                    jsonTemplate["keywords"] += car1.model_make_display.title() + ", "
+                    description += car1.model_make_display.title() + ", "
+                if car2:
+                    jsonTemplate["keywords"] += car2.model_make_display.title() + ", "
+                    description += car2.model_make_display.title() + ", "
+                if car3:
+                    jsonTemplate["keywords"] += car3.model_make_display.title() + ", "
+                    description += car3.model_make_display.title() + ", "
+                description += "side by side and rank them according to your preferences."
+                jsonTemplate["description"] = description
+
+                rank1_car_name = ""
+                rank2_car_name = ""
+                rank3_car_name = ""
+                rank1Car = None
+                rank2Car = None
+                rank3Car = None
+                rankCars = {}
+                seen = set()
+                for i in range(len(row[3]['model_id'])):
+                    rank = int(row[3]['rnk_consolidate_final'][str(i)])
+                    carId = int(row[3]['model_id'][str(i)])
+                    aCar = carIDMap.get(carId)
+                    carName = aCar.model_make_display +" "+aCar.model_name+" ("+str(aCar.model_year)+") "
+                    rankCars[str(rank)] = carName
+
+                    if rank == int(min(row[3]['rnk_consolidate_final'].values())):
+                        jsonTemplate["stars_car1"] = "<i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i>"
+                        jsonTemplate["image_car1"] = aCar.image
+                        jsonTemplate["carName1"] = carName
+                        seen.add(i)
+                        rank1_car_name = carName
+                        rank1Car = aCar
+
+                    if rank == int(max(row[3]['rnk_consolidate_final'].values())):
+                        seen.add(i)
+                        jsonTemplate["stars_car3"] = "<i class=\"fas fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i>"
+                        jsonTemplate["image_car3"] = aCar.image
+                        jsonTemplate["carName3"] = carName
+                        rank3_car_name = carName
+                        rank3Car = aCar
+
+                for i in range(len(row[3]['model_id'])):
+                    if not i in seen:
+                        rank = int(row[3]['rnk_consolidate_final'][str(i)])
+                        carId = int(row[3]['model_id'][str(i)])
+                        aCar = carIDMap.get(carId)
+                        carName = aCar.model_make_display +" "+aCar.model_name+" ("+str(aCar.model_year)+") "
+                        rankCars[str(rank)] = carName
+                        # TODO, rank is not always 1
+                        if rank == 2:
+                            jsonTemplate["stars_car2"] = "<i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i>"
+                            jsonTemplate["image_car2"] = aCar.image
+                            jsonTemplate["carName2"] = carName
+                            rank2_car_name = carName
+                            rank2Car = aCar
+
+
+                jsonTemplate["line1"] = Template(jsonTemplate["line1"]).substitute(car1=rank1_car_name, car2=rank2_car_name, car3=rank3_car_name)
+                criteria = row[2]
+                criteria_rows = ""
+                line3Text = []
+                for i in range(len(criteria)):
+                    otherData = row[7]
+                    displayName = criteria[i]["displayname"]
+                    colName = criteria[i]["col_name"]
+                    pref = "Lower the better"
+                    localHighestLowest = "Lowest"
+                    if criteria[i]["preference"].lower() == "false":
+                        pref = "Higher the better"
+                        localHighestLowest = "Highest"
+                    importance = importanceArray[int(criteria[0]["importance"]) - 1]
+                    criteria_rows += "<tr><td>"+displayName+"</td><td>"+pref+"</td><td>"+importance+"</td></tr>"
+
+                    localRank1Car = None
+                    localRank2Car = None
+                    localRank3Car = None
+                    localCriteriaValue = None
+                    # otherData["rank_data"]["rnk_" + colName] = > {'0': 1.0, '1': 2.0, '2': 3.0}
+
+                    values = otherData["rank_data"]["rnk_" + colName].values()
+                    if max(values) == min(values):
+                        localRank1Car = carIDMap.get(otherData["rank_data"]["model_id"]["0"])
+                        localCriteriaValue = json.loads(localRank1Car.toJSON())[colName]
+                        localRank2Car = carIDMap.get(otherData["rank_data"]["model_id"]["1"])
+                        localRank3Car = carIDMap.get(otherData["rank_data"]["model_id"]["2"])
+                    else:
+
+                        for n in range(len(otherData["rank_data"]["rnk_" + colName])):
+                            if otherData["rank_data"]["rnk_"+colName][str(n)] == min(values):
+                                localRank1Car = carIDMap.get(otherData["rank_data"]["model_id"][str(n)])
+                                localCriteriaValue = json.loads(localRank1Car.toJSON())[colName]
+
+                        for n in range(len(otherData["rank_data"]["rnk_" + colName])):
+                            if otherData["rank_data"]["rnk_" + colName][str(n)] == max(values):
+                                localRank3Car = carIDMap.get(otherData["rank_data"]["model_id"][str(n)])
+
+                    #for Line 3
+                    line3Text.append(Template(jsonTemplate["line3"]).substitute(criteria=displayName, car1=car1.model_make_display +" "+car1.model_name+" ("+str(car1.model_year)+") ", \
+                                                               car2=car2.model_make_display +" "+car2.model_name+" ("+str(car2.model_year)+") ",\
+                                                               car3=car3.model_make_display +" "+car3.model_name+" ("+str(car3.model_year)+") ",\
+                                                               criteriaValueCar1=str(json.loads(car1.toJSON())[criteria[i]["col_name"]]), \
+                                                               criteriaValueCar2=str(json.loads(car2.toJSON())[criteria[i]["col_name"]]), \
+                                                               criteriaValueCar3=str(json.loads(car3.toJSON())[criteria[i]["col_name"]]), \
+                                                               givenPreference=pref, carWithRank1=localRank1Car.model_make_display+" "+localRank1Car.model_name+" ("+str(localRank1Car.model_year)+") ", \
+                                                                rank1CriteriaValue=localCriteriaValue, highestOrLowest=localHighestLowest, importanceDescription=importance, \
+                                                                carWithRank3=localRank3Car.model_make_display+" "+localRank3Car.model_name+" ("+str(localRank3Car.model_year)+") "
+                                                               ))
+
+                jsonTemplate["line3"] = line3Text
+                jsonTemplate["criteria_rows"] = criteria_rows
+
+                jsonTemplate["line4"] = Template(jsonTemplate["line4"]).substitute(carNameWithRank1=rank1_car_name)
+
+                listOfKey = [car1.model_make_display, car1.model_name, car2.model_make_display, car2.model_name, car3.model_make_display, car3.model_name]
+                relatedLinksData = getRelatedLinks(listOfKey)
+                # footerLinks = ""
+                # for r in range(len(relatedLinksData)):
+                #     linkData = relatedLinksData[r]
+                #     footerLinks += "<li><a href=\""+linkData["url"]+"\">"+linkData["displayText"]+"</a></li>\n"
+                # jsonTemplate["footer_links"] = footerLinks
+                substitutedData = template.substitute(jsonTemplate)
+
+
+                # print(str(substitutedData))
+                # blogPath = "/blogs/"+rank1CarMake+"/"+str(row[0])+".html"
+                # fileName = "../../ui-app/public"+blogPath
+                # print(fileName)
+                # if not path.exists(fileName):
+                #     dt = datetime.datetime.now().isoformat()
+                #     newFile = open(fileName, "x")
+
+                # htmlBlogQuery = " UPDATE cars.car_links SET  htmlblog='"+blogPath+"' WHERE id = "+str(row[0])+" ; "
+                # cursor.execute(htmlBlogQuery)
+                count += 1
+                # print("generate: " + str(substitutedData))
+                f.close()
+                return {"jsonTemplate":jsonTemplate, "relatedLinks":relatedLinksData}
+
+        # print("Total Generated: "+str(count))
+    except (Exception, psycopg2.Error) as error:
+        print("Error:", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            # print("PostgreSQL connection is closed")
+
+
+
 def insertLink(carsRequest, rankCriteria, rank_json, versus, category, all_ranks_json):
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
                                   database="daft")
@@ -228,7 +479,7 @@ def insertLink(carsRequest, rankCriteria, rank_json, versus, category, all_ranks
         postgres_insert_query += " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s , %s )"
 
         url = "/compare/" + category + "/" + str(number[0]) + "/" + versus
-        otherData = {"rank_data":json.loads(all_ranks_json)}
+        otherData = {"rank_data":json.loads(all_ranks_json), "blog_content":getHTMLContent(number[0], carsRequest, rankCriteria, rank_json, versus, versus, versus, {"rank_data":json.loads(all_ranks_json)}, url)}
         record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, versus, versus, versus, json.dumps((otherData)), url,)
 
 
@@ -281,7 +532,7 @@ def compareCars():
         criteria = []
 
         if len(rankCriteria) > 0:
-            criteria = rankCriteria[0]
+            criteria = rankCriteria
         else:
             criteria = defaultCriteria["criteria"][0]
             
@@ -296,40 +547,6 @@ def compareCars():
             rankConsolidate += cars['rnk_' + criteria[i]['col_name']] * cars[
                 'wgt_' + criteria[i]['col_name']]
         cars['rnk_consolidate'] = rankConsolidate
-        # else:
-        #
-        #     cars['rnk_model_year'] = cars['model_year'].rank(ascending=False)
-        #     cars['rnk_model_engine_cc'] = cars['model_engine_cc'].rank(ascending=False)
-        #     cars['rnk_model_engine_cyl'] = cars['model_engine_cyl'].rank(ascending=False)
-        #     cars['rnk_model_engine_power_rpm'] = cars['model_engine_power_rpm'].rank(ascending=False)
-        #     cars['rnk_model_engine_torque_rpm'] = cars['model_engine_torque_rpm'].rank(ascending=False)
-        #     cars['rnk_model_seats'] = cars['model_seats'].rank(ascending=False)
-        #     cars['rnk_model_doors'] = cars['model_doors'].rank(ascending=False)
-        #     cars['rnk_model_width_mm'] = cars['model_width_mm'].rank(ascending=False)
-        #     cars['rnk_model_height_mm'] = cars['model_height_mm'].rank(ascending=False)
-        #
-        #     cars['wgt_model_year'] = 0.3
-        #     cars['wgt_model_engine_cc'] = 0.1
-        #     cars['wgt_model_engine_cyl'] = 0.05
-        #     cars['wgt_model_engine_power_rpm'] = 0.05
-        #     cars['wgt_model_engine_torque_rpm'] = 0.05
-        #     cars['wgt_model_seats'] = 0.2
-        #     cars['wgt_model_doors'] = 0.1
-        #     cars['wgt_model_width_mm'] = 0.1
-        #     cars['wgt_model_height_mm'] = 0.1
-        #
-        #     model_year_Consilidate = cars['rnk_model_year'] * cars['wgt_model_year']
-        #     model_engine_cc_Consolidate = cars['rnk_model_engine_cc'] * cars['wgt_model_engine_cc']
-        #     model_engine_cyl_Consolidate = cars['rnk_model_engine_cyl'] * cars['wgt_model_engine_cyl']
-        #     model_engine_power_rpm_Consolidate = cars['rnk_model_engine_power_rpm'] * cars['wgt_model_engine_power_rpm']
-        #     model_engine_torque_rpm_Consolidate = cars['rnk_model_engine_torque_rpm'] * cars['wgt_model_engine_torque_rpm']
-        #     model_seats_Consolidate = cars['rnk_model_seats'] * cars['wgt_model_seats']
-        #     model_doors_Consolidate = cars['rnk_model_doors'] * cars['wgt_model_doors']
-        #     model_width_mm_Consolidate = cars['rnk_model_width_mm'] * cars['wgt_model_width_mm']
-        #     model_height_mm_Consolidate = cars['rnk_model_height_mm'] * cars['wgt_model_height_mm']
-        #
-        #     cars['rnk_consolidate'] = model_year_Consilidate + model_engine_cc_Consolidate + model_engine_cyl_Consolidate + model_engine_power_rpm_Consolidate + model_engine_torque_rpm_Consolidate + model_seats_Consolidate + model_doors_Consolidate + model_width_mm_Consolidate + model_height_mm_Consolidate
-
 
         cars['rnk_consolidate_final'] = cars['rnk_consolidate'].rank()
 
@@ -341,10 +558,9 @@ def compareCars():
             if i == len(cars_ranks['model_make_display']) -1:
                 dash = ""
             versus += cars_ranks['model_make_display'][i]+"-"+cars_ranks['model_name'][i]+"-"+str(int(cars_ranks['model_year'][i]))+dash
-        #cars_ranks['model_make_display'][0]+"-"+cars_ranks['model_name'][0]+"-"+str(int(cars_ranks['model_year'][0]))
         pushUrl = insertLink(carsRequest, criteria, rank_json, versus, "cars", cars.to_json())
         return {"cars_ranks":cars_ranks.to_json(), "pushUrl":pushUrl}
-        # return json.dumps([ob.__dict__ for ob in data])
+
     else:
         return "no data. provide vid1, vid2 and vid3 in query params"
 
@@ -381,35 +597,46 @@ def foundItems(key):
             print("PostgreSQL connection is closed")
 
 
+def getOneLinkInformation(row):
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    cursor2 = connection.cursor()
+    carDetails = []
+    listofId = str(row[1]).replace("[", "(").replace("]", ")")
+    carsQuery = " select model_id, model_make_id, model_name, model_trim, model_year, model_body, model_engine_position, model_engine_cc, model_engine_cyl, model_engine_type, model_engine_valves_per_cyl, model_engine_power_ps, model_engine_power_rpm, model_engine_torque_nm, model_engine_torque_rpm, model_engine_bore_mm, model_engine_stroke_mm, model_engine_compression, model_engine_fuel, model_top_speed_kph, model_0_to_100_kph, model_drive, model_transmission_type, model_seats, model_doors, model_weight_kg, model_length_mm, model_width_mm, model_height_mm, model_wheelbase_mm, model_lkm_hwy, model_lkm_mixed, model_lkm_city, model_fuel_cap_l, model_sold_in_us, model_co2, model_make_display, image from cars.car where model_id in " + listofId
+    cursor2.execute(carsQuery)
+    carRecords = cursor2.fetchall()
+    for carRow in carRecords:
+        carDetails.append(
+            Car(carRow[0], carRow[1], carRow[2], carRow[3], carRow[4], carRow[5], carRow[6], carRow[7], carRow[8],
+                carRow[9], carRow[10], carRow[11],
+                carRow[12], carRow[13], carRow[14], carRow[15], carRow[16], carRow[17], carRow[18], carRow[19],
+                carRow[20], carRow[21], carRow[22],
+                carRow[23], carRow[24], carRow[25], carRow[26], carRow[27], carRow[28], carRow[29], carRow[30],
+                carRow[31], carRow[32], carRow[33],
+                carRow[34], carRow[35], carRow[36], carRow[37]))
+    newCarDetails = json.dumps([ob.__dict__ for ob in carDetails])
+    if not newCarDetails:
+        newCarDetails = row[3]
+    linkInfo = LinkInformation(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], carDetails)
+    return linkInfo
+
 def getLinkData(key):
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
                                   database="daft")
     try:
         cursor = connection.cursor()
-        cursor2 = connection.cursor()
 
-        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where id = "+key
+        where = " where id = "+key
+
+        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links "+where
 
         if key:
             cursor.execute(sql_select_Query)
             records = cursor.fetchall()
             linkInfo = None
             for row in records:
-                carDetails = []
-                listofId = str(row[1]).replace("[", "(").replace("]",")")
-                carsQuery = " select model_id, model_make_id, model_name, model_trim, model_year, model_body, model_engine_position, model_engine_cc, model_engine_cyl, model_engine_type, model_engine_valves_per_cyl, model_engine_power_ps, model_engine_power_rpm, model_engine_torque_nm, model_engine_torque_rpm, model_engine_bore_mm, model_engine_stroke_mm, model_engine_compression, model_engine_fuel, model_top_speed_kph, model_0_to_100_kph, model_drive, model_transmission_type, model_seats, model_doors, model_weight_kg, model_length_mm, model_width_mm, model_height_mm, model_wheelbase_mm, model_lkm_hwy, model_lkm_mixed, model_lkm_city, model_fuel_cap_l, model_sold_in_us, model_co2, model_make_display, image from cars.car where model_id in "+listofId
-                cursor2.execute(carsQuery)
-                carRecords = cursor2.fetchall()
-                for carRow in carRecords:
-                    carDetails.append(Car(carRow[0], carRow[1], carRow[2], carRow[3], carRow[4], carRow[5], carRow[6], carRow[7], carRow[8], carRow[9], carRow[10], carRow[11],
-                    carRow[12], carRow[13], carRow[14], carRow[15], carRow[16], carRow[17], carRow[18], carRow[19], carRow[20], carRow[21], carRow[22],
-                    carRow[23], carRow[24], carRow[25], carRow[26], carRow[27], carRow[28], carRow[29], carRow[30], carRow[31], carRow[32], carRow[33],
-                    carRow[34], carRow[35], carRow[36], carRow[37]))
-                newCarDetails = json.dumps([ob.__dict__ for ob in carDetails])
-                if not newCarDetails:
-                    newCarDetails = row[3]
-                linkInfo = LinkInformation(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], newCarDetails)
-
+                linkInfo = getOneLinkInformation(row)
         return linkInfo
     except (Exception, psycopg2.Error) as error:
         print("Error reading data from MySQL table", error)
@@ -419,6 +646,35 @@ def getLinkData(key):
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
+
+
+def getAllLinkData():
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links "
+
+        allLinks = []
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+        for row in records:
+            allLinks.append(getOneLinkInformation(row))
+        return allLinks
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
+@app.route('/api/all/links/information', methods=['GET'])
+def getLinkInformationAll():
+    data = getAllLinkData()
+    return json.dumps([ob.__dict__ for ob in data])
 
 
 @app.route('/api/links/information', methods=['GET'])
@@ -463,7 +719,7 @@ def getCarDetails(id):
 
 
 @app.route('/api/car/details', methods=['GET'])
-def getCar():
+def getCar12():
     id = request.args.get('id')
     # return json.dumps(foundItems(key))
     description = json.dumps([ob.__dict__ for ob in listAllFields()])
@@ -570,7 +826,7 @@ def getAllBlogLinks():
                                   database="daft")
     try:
         cursor = connection.cursor()
-        sql_select_Query = " select htmlblog, display_text from cars.car_links where htmlblog != '' and display_text != '' order by id desc   "
+        sql_select_Query = " select url, display_text from cars.car_links where url != '' and display_text != '' order by id desc LIMIT 10  "
 
         cursor = connection.cursor()
 
