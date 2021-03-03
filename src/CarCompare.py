@@ -8,7 +8,7 @@ import pandas as pd
 import os
 import os.path
 from os import path
-
+from random import randrange
 from string import Template
 import urllib
 import urllib.parse
@@ -25,8 +25,9 @@ jsonTemplate = {}
 
 importanceArray = ["at all important", "Slightly important", "Important", "Fairly Important", "Very important"]
 
-
-
+line1 = ["Buying a car is always tricky.In this blog, we will compare $car1, $car2 and $car3, and find out which one is good and why?","In this blog, lets compare $car1, $car2 and $car3 , and understand which car is better and which car to buy. We will compare all specs and trims and rank cars to suit your needs."]
+line3 = ["When we compare $criteria, we found that $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n                        Because given preference is $givenPreference, it comes out that $carWithRank1 is the best because it has $criteria as $rank1CriteriaValue which is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3\n.","Lets understand which car is best based on $criteria. $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n It was mentioned that  $criteria is $givenPreference. So, $carWithRank1 seems better than the other two cars because its $rank1CriteriaValue is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3.\n"]
+line4 = ["In the end, we calculate the final rank of cars by adding all the weighted ranks of each criteria. So, finally, $carNameWithRank1 stands out to be the best one becuase your important \ncriteria are best matched in this car.","To rank all the above cars, we use the importance of each criteria mentioned. When we add weighted ranks, $carNameWithRank1 seems to be the best one among others because the mentioned criteria are best matched in this car."]
 class Car:
     def __init__(self, model_id,model_make_id,model_name,model_trim,model_year,model_body,model_engine_position,model_engine_cc,model_engine_cyl,model_engine_type,model_engine_valves_per_cyl,model_engine_power_ps,model_engine_power_rpm,model_engine_torque_nm,model_engine_torque_rpm,model_engine_bore_mm,model_engine_stroke_mm,model_engine_compression,model_engine_fuel,model_top_speed_kph,model_0_to_100_kph,model_drive,model_transmission_type,model_seats,model_doors,model_weight_kg,model_length_mm,model_width_mm,model_height_mm,model_wheelbase_mm,model_lkm_hwy,model_lkm_mixed,model_lkm_city,model_fuel_cap_l,model_sold_in_us,model_co2,model_make_display, image):
         self.model_id = model_id
@@ -291,7 +292,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
         # cursor.execute(sqlQuery)
         # records = cursor.fetchall()
         # for row in records:
-        blogTemplateFile = os.getcwd()+'/doc/blog-template.json'
+        blogTemplateFile = os.path.join(os.getcwd(),  "blog-template.json")
         print("Blog Template File : "+blogTemplateFile)
         with open(blogTemplateFile, 'r') as tf:
             jsonTemplate = json.loads(tf.read())
@@ -304,7 +305,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
             carIDMap = {row[1][0]:car1,row[1][1]:car2,row[1][2]:car3}
 
 
-            htmlTemplateFile = os.getcwd()+'/doc/template.html'
+            htmlTemplateFile = os.path.join(os.getcwd(),  "template.html")
             print(htmlTemplateFile)
             with open(htmlTemplateFile, 'r') as f:
                 data = f.read()
@@ -372,7 +373,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                             rank2Car = aCar
 
 
-                jsonTemplate["line1"] = Template(jsonTemplate["line1"]).substitute(car1=rank1_car_name, car2=rank2_car_name, car3=rank3_car_name)
+                jsonTemplate["line1"] = Template(line1[randrange(2)]).substitute(car1=rank1_car_name, car2=rank2_car_name, car3=rank3_car_name)
                 criteria = row[2]
                 criteria_rows = ""
                 line3Text = []
@@ -412,7 +413,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                                 localRank3Car = carIDMap.get(otherData["rank_data"]["model_id"][str(n)])
 
                     #for Line 3
-                    line3Text.append(Template(jsonTemplate["line3"]).substitute(criteria=displayName, car1=car1.model_make_display +" "+car1.model_name+" ("+str(car1.model_year)+") ", \
+                    line3Text.append(Template(line3[randrange(2)]).substitute(criteria=displayName, car1=car1.model_make_display +" "+car1.model_name+" ("+str(car1.model_year)+") ", \
                                                                car2=car2.model_make_display +" "+car2.model_name+" ("+str(car2.model_year)+") ",\
                                                                car3=car3.model_make_display +" "+car3.model_name+" ("+str(car3.model_year)+") ",\
                                                                criteriaValueCar1=str(json.loads(car1.toJSON())[criteria[i]["col_name"]]), \
@@ -426,7 +427,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                 jsonTemplate["line3"] = line3Text
                 jsonTemplate["criteria_rows"] = criteria_rows
 
-                jsonTemplate["line4"] = Template(jsonTemplate["line4"]).substitute(carNameWithRank1=rank1_car_name)
+                jsonTemplate["line4"] = Template(line4[randrange(2)]).substitute(carNameWithRank1=rank1_car_name)
 
                 listOfKey = [car1.model_make_display, car1.model_name, car2.model_make_display, car2.model_name, car3.model_make_display, car3.model_name]
                 relatedLinksData = getRelatedLinks(listOfKey)

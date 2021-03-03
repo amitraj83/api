@@ -12,10 +12,10 @@
   "image_car1": "002_o_2015.jpg",
   "image_car2": "002_o_2015.jpg",
   "image_car3": "002_o_2015.jpg",
-  "line1": "Buying a car is always tricky.In this blog, we will compare $car1, $car2 and $car3, and find out which one is good and why?",
+  "line1": "",
   "line2": "To compare and rank the cars, the criteia used are:",
   "criteria_rows": "<tr><td>Doors</td><td>Higher the better</td><td>Faily Important</td></tr><tr><td>Enginer Size</td><td>Higher the better</td><td>Important</td></tr>",
-  "line3": "When we compare $criteria, we found that $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n                        Because given preference is $givenPreference, it comes out that $carWithRank1 is the best because it has $criteria as $rank1CriteriaValue which is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3\n.",
-  "line4": "In the end, we calculate the final rank of cars by adding all the weighted ranks of each criteria. So, finally, $carNameWithRank1 stands out to be the best one becuase your important \ncriteria are best matched in this car.",
+  "line3": "",
+  "line4": "",
   "footer_links": ""
 }
