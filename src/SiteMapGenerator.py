@@ -15,7 +15,7 @@ def main():
         sqlQuery = " select url , htmlblog FROM cars.car_links "
         cursor.execute(sqlQuery)
         records = cursor.fetchall()
-        dt = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S%z")
+        dt = "2021-02-22T17:18:13+00:00"
         sitemap = open("../../ui-app/build/sitemap.xml", "w+")
         sitemap.write("<?xml version = \"1.0\" encoding = \"UTF-8\" ?>\n")
         sitemap.write("<urlset\n")
