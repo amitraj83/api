@@ -291,8 +291,9 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
         # cursor.execute(sqlQuery)
         # records = cursor.fetchall()
         # for row in records:
-
-        with open('../doc/blog-template.json', 'r') as tf:
+        blogTemplateFile = os.getcwd()+'/doc/blog-template.json'
+        print("Blog Template File : "+blogTemplateFile)
+        with open(blogTemplateFile, 'r') as tf:
             jsonTemplate = json.loads(tf.read())
 
 
@@ -303,8 +304,9 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
             carIDMap = {row[1][0]:car1,row[1][1]:car2,row[1][2]:car3}
 
 
-
-            with open('../doc/template.html', 'r') as f:
+            htmlTemplateFile = os.getcwd()+'/doc/template.html'
+            print(htmlTemplateFile)
+            with open(htmlTemplateFile, 'r') as f:
                 data = f.read()
                 template = Template(data)
                 jsonTemplate["title"] = row[6]
