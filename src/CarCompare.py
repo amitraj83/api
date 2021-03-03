@@ -311,18 +311,18 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                 template = Template(data)
                 jsonTemplate["title"] = row[6]
                 jsonTemplate["pageURL"] = urllib.parse.quote(row[8])
-                jsonTemplate["keywords"] = "Compare Car side by side, car comparison tool, "
+                jsonTemplate["keywords"] = "Car, compare, compare cars, compare car specs, compare car features, compare engine specifications, compare Car side by side, car comparison tool, "
                 description = "Compare "
                 if car1:
-                    jsonTemplate["keywords"] += car1.model_make_display.title() + ", "
-                    description += car1.model_make_display.title() + ", "
+                    jsonTemplate["keywords"] += car1.model_make_display.title() + " "+ car1.model_name.title() +"("+car1.model_year+")" +", "
+                    description += car1.model_make_display.title() + " "+ car1.model_name.title() +"("+car1.model_year+")" + " vs "
                 if car2:
-                    jsonTemplate["keywords"] += car2.model_make_display.title() + ", "
-                    description += car2.model_make_display.title() + ", "
+                    jsonTemplate["keywords"] += car2.model_make_display.title() + " "+ car1.model_name.title() +"("+car1.model_year+")" + ", "
+                    description += car2.model_make_display.title() + " "+ car1.model_name.title() +"("+car1.model_year+")" + " vs "
                 if car3:
-                    jsonTemplate["keywords"] += car3.model_make_display.title() + ", "
-                    description += car3.model_make_display.title() + ", "
-                description += "side by side and rank them according to your preferences."
+                    jsonTemplate["keywords"] += car3.model_make_display.title() + " "+ car1.model_name.title() +"("+car1.model_year+")" + ", "
+                    description += car3.model_make_display.title() + " "+ car1.model_name.title() +"("+car1.model_year+")" + " vs "
+                description += "side by side and find out which car is better. See full car specs and trims. Ranks cars to decide which car to buy"
                 jsonTemplate["description"] = description
 
                 rank1_car_name = ""
