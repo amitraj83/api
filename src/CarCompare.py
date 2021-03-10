@@ -823,6 +823,30 @@ def getVariants(make, model):
             connection.close()
             print("PostgreSQL connection is closed")
 
+def getThreeRandomBlogLinks():
+    connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
+                                  database="daft")
+    try:
+        cursor = connection.cursor()
+        sql_select_Query = " select  other_data, url from cars.car_links where other_data::text != '{}'::text and url != '' and display_text != '' order by RANDOM() LIMIT 3 "
+
+        cursor = connection.cursor()
+
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+        listOfBlogs = []
+        for row in records:
+            listOfBlogs.append({"other_data": row[0], "url": row[1]})
+
+        return listOfBlogs
+    except (Exception, psycopg2.Error) as error:
+        print("Error reading data from MySQL table", error)
+    finally:
+        if (connection):
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
 
 def getAllBlogLinks():
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
@@ -960,6 +984,11 @@ def getBlogsLInks():
 
     return json.dumps(getAllBlogLinks());
 
+
+@app.route('/api/car/blogs/cards', methods=['GET'])
+def getThreeBlogsLInks():
+
+    return json.dumps(getThreeRandomBlogLinks());
 
 
 @app.after_request
