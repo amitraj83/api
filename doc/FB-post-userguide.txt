@@ -1,0 +1,8 @@
+Go to: https://developers.facebook.com/tools/explorer/?method=GET&path=me%2Faccounts&version=v10.0
+and run this
+me/accounts
+You will get the token.
+
+Use that token in the following request.
+
+curl --location --request POST 'https://graph.facebook.com/v10.0/104277171736451/feed?message=CarComparison&link=https://suggestrank.com&access_token=EAAGbXclcDJcBANNv5WVbYGsnEwiZA2OE3JhGZCp2m3qqAYbAbOBmMtAML1iYozcsrzZBwkE2lMvXfqjmslqcZBysnn56wLBJciOveTXSdyuRp8gCnhZCgyuFyZA4rVylAIj5LUXdPAuPMrGGEVBoaPoZBciw46AL9eHCwRvC4sZCobmeXAtyckbSWXkCiS9Ux3H84UizrYARgQZDZD'
