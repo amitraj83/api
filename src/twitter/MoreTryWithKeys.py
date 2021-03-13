@@ -19,7 +19,7 @@ api=tweepy.API(auth)
 
 # tweet=input('enter the tweet')
 #Generate text tweet
-# api.update_status(tweet)
+api.update_status("Why buy this car? Checkout this https://suggestrank.com/compare/cars/2907/Toyota-Auris-2007-vs-Toyota-Highlander-2007-vs-Toyota-RunX-2007")
 
 # tweet_text=input('enter the tweet ')
 # image_path =input('enter the path of the image ')
