@@ -14,9 +14,12 @@ auth=tweepy.OAuthHandler(consumer_key,consumer_secret_key)
 auth.set_access_token(access_token,access_token_secret)
 api=tweepy.API(auth)
 
-tweet=input('enter the tweet')
+# list = api.home_timeline(1)
+# print(list)
+
+# tweet=input('enter the tweet')
 #Generate text tweet
-api.update_status(tweet)
+# api.update_status(tweet)
 
 # tweet_text=input('enter the tweet ')
 # image_path =input('enter the path of the image ')
