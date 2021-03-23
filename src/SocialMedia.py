@@ -76,7 +76,7 @@ def getData():
             connection.close()
 
 def main():
-    with open(r'secret.yaml') as file:
+    with open(r'/root/car-compare/api/src/secret.yaml') as file:
         secrets = yaml.full_load(file)
 
 
@@ -88,7 +88,6 @@ def main():
 
 
         dataList = getData()
-        print(dataList)
         for i in range(len(dataList)):
             data = dataList[i]
             title = data['title']
@@ -108,11 +107,10 @@ def main():
                 auth.set_access_token(access_token, access_token_secret)
                 api = tweepy.API(auth)
                 witterResponseStatus = api.update_status(twitterStatus)
-                logging.info("Twitter status: "+str(witterResponseStatus))
+                logging.info("Twitter status: "+str(url))
                 # print(str(twitterStatus))
             else:
                 fbUrl = 'https://graph.facebook.com/v10.0/104277171736451/feed?message='+urllib.parse.quote(title)+' '+urllib.parse.quote(hashTags)+'&link='+url+'&access_token='+fbAccessToken
-                print(fbUrl)
                 response = requests.post(fbUrl)
                 # print(response.json())
                 logging.info('Facebook Status: '+str(response.json()))

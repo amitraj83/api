@@ -12,7 +12,7 @@ def main():
         cursor2 = connection.cursor()
         count = 0
         totalIterations = 0;
-        while count < 5 and totalIterations < 50000:
+        while count < 5000 and totalIterations < 50000:
             totalIterations += 1
             # print("Total Iterations: ", totalIterations)
 
