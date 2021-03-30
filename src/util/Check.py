@@ -5,9 +5,9 @@ def main():
     size = 580, 290
 
     try:
-        im = Image.open("C:\\house-idea\\carimagery\\carimagery\\seat-ibiza-2017-2018-1508817347.77.jpg")
+        im = Image.open("C:\\house-idea\\carimagery\\carimagery\\maserati-granturismo-2007-2017-1462430872.64.png")
         im.thumbnail(size, Image.ANTIALIAS)
-        im.save("C:\\house-idea\\carimagery\\carimagery\\seat-ibiza-2017-2018-1508817347.77-scaled.jpg", "JPEG")
+        im.save("C:\\house-idea\\carimagery\\carimagery\\maserati-granturismo-2007-2017-1462430872.64-scaled.png")
     except IOError:
         print
         "cannot create thumbnail for "
