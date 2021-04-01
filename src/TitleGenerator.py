@@ -2,22 +2,22 @@ from string import Template
 from random import randrange
 import json
 
-allTitles = [{'title':'$year $carName - 9 awesome specs and reviews',
-              'description':'9 awesome specs that makes $year $carName better than others. View $carName specs, reviews and comparison before buying used cars for sale.'},
-             {'title':'$year $carName - 9 unbelievable specs and reviews',
-              'description':'9 unbelievable specs that makes $year $carName better than others. View $carName specs, reviews and comparison before buying used cars for sale.'},
-             {'title':'$year $carName - 9 amazing specs and reviews',
-              'description':'9 amazing specs that makes $year $carName better than others. View $carName specs, reviews and comparison before buying used cars for sale.'},
+allTitles = [{'title':'$year $carName - 9 awesome specs and review',
+              'description':'9 awesome specs that makes $year $carName better than others. View $carName specs, review and comparison before buying used cars for sale.'},
+             {'title':'$year $carName - 9 unbelievable specs and review',
+              'description':'9 unbelievable specs that makes $year $carName better than others. View $carName specs, review and comparison before buying used cars for sale.'},
+             {'title':'$year $carName - 9 amazing specs and review',
+              'description':'9 amazing specs that makes $year $carName better than others. View $carName specs, review and comparison before buying used cars for sale.'},
              {'title':'$year $carName - 9 facts making it great car',
-              'description':'9 amazing facts that makes $year $carName better than others. View $carName specs, reviews and comparison before buying used cars for sale.'},
+              'description':'9 amazing facts that makes $year $carName better than others. View $carName specs, review and comparison before buying used cars for sale.'},
              {'title':'$year $carName - 9 facts making it the best car',
-              'description':'9 amazing facts that makes $year $carName better than others. View $carName specs, reviews and comparison before buying used cars for sale.'},
+              'description':'9 amazing facts that makes $year $carName better than others. View $carName specs, review and comparison before buying used cars for sale.'},
              {'title':'$year $carName - Do not miss these 9 facts',
-              'description':'9 awesome facts that makes $year $carName better than others. View $carName specs, reviews and comparison before buying used cars for sale.'},
+              'description':'9 awesome facts that makes $year $carName better than others. View $carName specs, review and comparison before buying used cars for sale.'},
              {'title':'$year $carName - 9 amazing reasons to buy this car',
-              'description':'9 amazing reasons that makes $year $carName better than others. View $carName specs, reviews and comparison before buying used cars for sale.'},
+              'description':'9 amazing reasons that makes $year $carName better than others. View $carName specs, review and comparison before buying used cars for sale.'},
              {'title':'$year $carName - 9 amazing facts to buy this car',
-              'description':'9 amazing facts that makes $year $carName better than others. View $carName specs, reviews and comparison before buying used cars for sale.'}
+              'description':'9 amazing facts that makes $year $carName better than others. View $carName specs, review and comparison before buying used cars for sale.'}
              ]
 
 allKeywords = ['$year $carName', '$year $carName specs', '$year $carName review', '$year $carName price']

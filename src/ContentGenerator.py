@@ -15,6 +15,7 @@ headPara = ["$powerKeyword is definitely an amazing car. There are several specs
 
 line1 = ["In this blog, we will compare $car1 specs, $car2 specs and $car3 specs, and find out which one is good and why?","In this blog, lets compare $car1 specs, $car2 specs and $car3 specs, and understand which car is better and which car to buy. We will compare all specs and trims and rank cars to suit your needs."]
 line3 = ["When we compare $criteria, we found that $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n                        Because given preference is $givenPreference, it comes out that $carWithRank1 is the best because it has $criteria as $rank1CriteriaValue which is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3\n.","Lets understand which car is best based on $criteria. $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n It was mentioned that  $criteria is $givenPreference. So, $carWithRank1 seems better than the other two cars because its $rank1CriteriaValue is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3.\n"]
+line3H3Heading = []
 line4 = ["In the end, we calculate the final rank of cars by adding all the weighted ranks of each criteria. So, finally, $carNameWithRank1 stands out to be the best one becuase your important \ncriteria are best matched in this car.","To rank all the above cars, we use the importance of each criteria mentioned. When we add weighted ranks, $carNameWithRank1 seems to be the best one among others because the mentioned criteria are best matched in this car."]
 
 
@@ -195,7 +196,10 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                                 localRank3Car = carIDMap.get(otherData["rank_data"]["model_id"][str(n)])
 
                     #for Line 3
-                    line3Text.append(Template(line3[randrange(2)]).substitute(criteria=displayName, car1=car1.model_make_display +" "+car1.model_name+" ("+str(car1.model_year)+") ", \
+
+                    h3Heading = str(car1.model_year) +" "+car1.model_make_display +" "+car1.model_name+" specs - "+displayName
+                    line3H3Heading.append(h3Heading)
+                    line3Text.append(Template(line3[randrange(2)]).substitute(h3Heading=h3Heading,criteria=displayName, car1=car1.model_make_display +" "+car1.model_name+" ("+str(car1.model_year)+") ", \
                                                                car2=car2.model_make_display +" "+car2.model_name+" ("+str(car2.model_year)+") ",\
                                                                car3=car3.model_make_display +" "+car3.model_name+" ("+str(car3.model_year)+") ",\
                                                                criteriaValueCar1=str(json.loads(car1.toJSON())[criteria[i]["col_name"]]), \
@@ -207,6 +211,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                                                                ))
 
                 jsonTemplate["line3"] = line3Text
+                jsonTemplate["line3H3Heading"] = line3H3Heading
                 jsonTemplate["criteria_rows"] = criteria_rows
                 jsonTemplate["headPara"] = Template(headPara[randrange(len(headPara))]).substitute(powerKeyword=powerKeyword)
 
