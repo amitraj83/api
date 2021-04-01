@@ -135,7 +135,7 @@ defaultCriteria = {
 }
 
 class LinkInformation:
-    def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data, url, carDetails):
+    def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data, url, carDetails, keywords):
         self.id = id
         self.car_ids = car_ids
         self.criteria = criteria
@@ -146,6 +146,7 @@ class LinkInformation:
         self.other_data = other_data
         self.url = url
         self.carDetails = carDetails
+        self.keywords = keywords
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
@@ -342,7 +343,7 @@ def getOneLinkInformation(row):
     newCarDetails = json.dumps([ob.__dict__ for ob in carDetails])
     if not newCarDetails:
         newCarDetails = row[3]
-    linkInfo = LinkInformation(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], carDetails)
+    linkInfo = LinkInformation(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], carDetails, row[9])
     return linkInfo
 
 def getLinkData(key):
@@ -353,7 +354,7 @@ def getLinkData(key):
 
         where = " where id = "+key
 
-        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links "+where
+        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url, keywords from cars.car_links "+where
 
         if key:
             cursor.execute(sql_select_Query)
@@ -377,7 +378,7 @@ def getAllLinkData():
                                   database="daft")
     try:
         cursor = connection.cursor()
-        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links "
+        sql_select_Query = " select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url, keywords from cars.car_links "
 
         allLinks = []
         cursor.execute(sql_select_Query)

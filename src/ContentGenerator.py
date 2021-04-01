@@ -7,16 +7,18 @@ import urllib.parse
 import psycopg2
 import json
 from Classes import Car
+from RandomExternalLink import randomExternalLink
 
 
 importanceArray = ["at all important", "Slightly important", "Important", "Fairly Important", "Very important"]
 
-headPara = ["$powerKeyword is definitely an amazing car. There are several specs of $powerKeyword which makes it better than other cars. So, it is important to understand its powerful specs and compare with others before buying used cars for sale."]
+headPara = ["$powerKeyword is definitely an amazing car. Some of the $powerKeyword specs makes it better than other cars. So, it is important to understand its powerful specs and compare with others before buying used cars for sale."]
 
 line1 = ["In this blog, we will compare $car1 specs, $car2 specs and $car3 specs, and find out which one is good and why?","In this blog, lets compare $car1 specs, $car2 specs and $car3 specs, and understand which car is better and which car to buy. We will compare all specs and trims and rank cars to suit your needs."]
-line3 = ["When we compare $criteria, we found that $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n                        Because given preference is $givenPreference, it comes out that $carWithRank1 is the best because it has $criteria as $rank1CriteriaValue which is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3\n.","Lets understand which car is best based on $criteria. $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n It was mentioned that  $criteria is $givenPreference. So, $carWithRank1 seems better than the other two cars because its $rank1CriteriaValue is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3.\n"]
+line3 = ["During the $car1 review for $criteria, we found that $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n                        Because given preference is $givenPreference, it comes out that $carWithRank1 is the best because it has $criteria as $rank1CriteriaValue which is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3\n.","Lets do $car1 review to understand if this is the best based on $criteria. $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n It was mentioned that  $criteria is $givenPreference. So, $carWithRank1 seems better than the other two cars because its $rank1CriteriaValue is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3.\n"]
 line3H3Heading = []
-line4 = ["In the end, we calculate the final rank of cars by adding all the weighted ranks of each criteria. So, finally, $carNameWithRank1 stands out to be the best one becuase your important \ncriteria are best matched in this car.","To rank all the above cars, we use the importance of each criteria mentioned. When we add weighted ranks, $carNameWithRank1 seems to be the best one among others because the mentioned criteria are best matched in this car."]
+line3H3HeadingExternalLink = []
+line4 = ["During our car comparison, we compared $versus1, $versus2 and $versus3. In this car comparison, we calculate the final rank of cars by adding all the weighted ranks of each criteria. This car comparison shows that $carNameWithRank1 stands out to be the best one becuase your important \ncriteria are best matched in this car.","In this car comparison and ranking, we compared $versus1, $versus2 and $versus3. We use the importance of each criteria mentioned. When we add weighted ranks, $carNameWithRank1 seems to be the best one among others because the mentioned criteria are best matched in this car."]
 
 
 def getRelatedLinks(listOfKeys):
@@ -124,7 +126,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                     rank = int(row[3]['rnk_consolidate_final'][str(i)])
                     carId = int(row[3]['model_id'][str(i)])
                     aCar = carIDMap.get(carId)
-                    carName = aCar.model_make_display +" "+aCar.model_name+" ("+str(aCar.model_year)+") "
+                    carName = str(aCar.model_year)+" "+aCar.model_make_display +" "+aCar.model_name
                     rankCars[str(rank)] = carName
 
                     if rank == int(min(row[3]['rnk_consolidate_final'].values())):
@@ -146,7 +148,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                         rank = int(row[3]['rnk_consolidate_final'][str(i)])
                         carId = int(row[3]['model_id'][str(i)])
                         aCar = carIDMap.get(carId)
-                        carName = aCar.model_make_display +" "+aCar.model_name+" ("+str(aCar.model_year)+") "
+                        carName = str(aCar.model_year) +" "+aCar.model_make_display +" "+aCar.model_name
                         rankCars[str(rank)] = carName
                         # TODO, rank is not always 1
                         if rank == 2:
@@ -160,6 +162,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                 criteria = row[2]
                 criteria_rows = ""
                 line3Text = []
+                randomPositionForExternalLink = randrange(len(criteria))
                 for i in range(len(criteria)):
                     otherData = row[7]
                     displayName = criteria[i]["displayname"]
@@ -197,25 +200,39 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
 
                     #for Line 3
 
-                    h3Heading = str(car1.model_year) +" "+car1.model_make_display +" "+car1.model_name+" specs - "+displayName
+                    h3Heading = str(localRank1Car.model_year)+" "+localRank1Car.model_make_display+" "+localRank1Car.model_name+" specs - "+displayName
                     line3H3Heading.append(h3Heading)
-                    line3Text.append(Template(line3[randrange(2)]).substitute(h3Heading=h3Heading,criteria=displayName, car1=car1.model_make_display +" "+car1.model_name+" ("+str(car1.model_year)+") ", \
-                                                               car2=car2.model_make_display +" "+car2.model_name+" ("+str(car2.model_year)+") ",\
-                                                               car3=car3.model_make_display +" "+car3.model_name+" ("+str(car3.model_year)+") ",\
+                    if i == randomPositionForExternalLink:
+                        line3H3HeadingExternalLink.append(randomExternalLink(localRank1Car.model_make_display))
+                    else:
+                        line3H3HeadingExternalLink.append("")
+                    line3Text.append(Template(line3[randrange(2)]).substitute(h3Heading=h3Heading,criteria=displayName, car1=str(car1.model_year)+" "+car1.model_make_display +" "+car1.model_name, \
+                                                               car2=str(car2.model_year)+" "+car2.model_make_display +" "+car2.model_name,\
+                                                               car3=str(car3.model_year)+" "+car3.model_make_display +" "+car3.model_name,\
                                                                criteriaValueCar1=str(json.loads(car1.toJSON())[criteria[i]["col_name"]]), \
                                                                criteriaValueCar2=str(json.loads(car2.toJSON())[criteria[i]["col_name"]]), \
                                                                criteriaValueCar3=str(json.loads(car3.toJSON())[criteria[i]["col_name"]]), \
-                                                               givenPreference=pref, carWithRank1=localRank1Car.model_make_display+" "+localRank1Car.model_name+" ("+str(localRank1Car.model_year)+") ", \
+                                                               givenPreference=pref, carWithRank1=str(localRank1Car.model_year)+" "+localRank1Car.model_make_display+" "+localRank1Car.model_name, \
                                                                 rank1CriteriaValue=localCriteriaValue, highestOrLowest=localHighestLowest, importanceDescription=importance, \
-                                                                carWithRank3=localRank3Car.model_make_display+" "+localRank3Car.model_name+" ("+str(localRank3Car.model_year)+") "
+                                                                carWithRank3=str(localRank3Car.model_year)+" "+localRank3Car.model_make_display+" "+localRank3Car.model_name
                                                                ))
 
                 jsonTemplate["line3"] = line3Text
                 jsonTemplate["line3H3Heading"] = line3H3Heading
+                jsonTemplate["line3H3HeadingExternalLink"] = line3H3HeadingExternalLink
                 jsonTemplate["criteria_rows"] = criteria_rows
                 jsonTemplate["headPara"] = Template(headPara[randrange(len(headPara))]).substitute(powerKeyword=powerKeyword)
-
-                jsonTemplate["line4"] = Template(line4[randrange(2)]).substitute(carNameWithRank1=rank1_car_name)
+                versus1 = ""
+                versus2 = ""
+                if (car1.model_make_display == car2.model_make_display and car2.model_make_display == car3.model_make_display):
+                    versus1 = car1.model_make_display +" "+car1.model_name+" vs "+car2.model_name
+                    versus2 = car1.model_make_display +" "+car1.model_name+" vs "+car3.model_name
+                    versus3 = car1.model_make_display +" "+car2.model_name+" vs "+car3.model_name
+                else:
+                    versus1 = car1.model_make_display + " " + car1.model_name + " vs " +car2.model_make_display + " " + car2.model_name
+                    versus2 = car1.model_make_display + " " + car1.model_name + " vs " +car3.model_make_display + " " + car3.model_name
+                    versus3 = car2.model_make_display + " " + car2.model_name + " vs " +car3.model_make_display + " " + car3.model_name
+                jsonTemplate["line4"] = Template(line4[randrange(2)]).substitute(carNameWithRank1=rank1_car_name, versus1=versus1, versus2=versus2, versus3=versus3)
 
                 listOfKey = [car1.model_make_display, car1.model_name, car2.model_make_display, car2.model_name, car3.model_make_display, car3.model_name]
                 relatedLinksData = getRelatedLinks(listOfKey)
