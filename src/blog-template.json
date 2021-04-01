@@ -17,5 +17,6 @@
   "criteria_rows": "<tr><td>Doors</td><td>Higher the better</td><td>Faily Important</td></tr><tr><td>Enginer Size</td><td>Higher the better</td><td>Important</td></tr>",
   "line3": "",
   "line4": "",
-  "footer_links": ""
+  "footer_links": "",
+  "headPara": ""
 }

@@ -17,40 +17,64 @@ search on ahrefs
 Find out top keyword
 Find out other five keywords
 
-TItle => year {top keyword} - 9 awesome specs and reviews
-Description => 9 awesome specs that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+TItle =>  {top keyword} year - 9 awesome specs and reviews
+Description => 9 awesome specs that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK specs, reviews and comparison before buying used cars for sale.
 
 TItle => year {top keyword} - 9 unbelievable specs and reviews
-Description => 9 unbelievable specs that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+Description => 9 unbelievable specs that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK specs, reviews and comparison before buying used cars for sale.
 
 TItle => year {top keyword} - 9 amazing specs and reviews
-Description => 9 amazing specs that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+Description => 9 amazing specs that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK specs, reviews and comparison before buying used cars for sale.
 
 TItle => year {top keyword} - 9 facts making it great car
-Description => 9 amazing facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+Description => 9 amazing facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK specs, reviews and comparison before buying used cars for sale.
 
 TItle => year {top keyword} - 9 facts making it the best car
-Description => 9 amazing facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+Description => 9 amazing facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK specs, reviews and comparison before buying used cars for sale.
 
 TItle => year {top keyword} - Don't miss these 9 facts
-Description => 9 awesome facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+Description => 9 awesome facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK specs, reviews and comparison before buying used cars for sale.
 
 TItle => year {top keyword} - 9 amazing reasons to buy this car
-Description => 9 amazing reasons that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+Description => 9 amazing reasons that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK specs, reviews and comparison before buying used cars for sale.
 
 TItle => year {top keyword} - 9 amazing facts to buy this car
-Description => 9 amazing facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+Description => 9 amazing facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK specs, reviews and comparison before buying used cars for sale.
 
 
 Meta description => 
 
-Content => use year in ()
+Content => use carname year
 
 
 Use the title above in alt of primage image. Use description above in the primary image.
 
 
+<h1>Title</h1>
+<h2>car1 vs car2 vs car3</h2>
 
-User h2 or h3 title
+One external link from here - https://ahrefs.com/keywords-explorer/google/us/overview?keyword=mercedes%20benz%20slk
+One internal link from - from the database.
+
+
+<h3>Introduction<h3>
+
+<h3>Engine</h3>
+
+<h3>Conclusion</h3>
+
+
+
+
+Things to do:
+Title
+Meta description
+Keywords
+Content starts with power keyword
+2 internal links in the content
+2 external links in the content
+H1 use
+H2 use
+H3 use
 
 
