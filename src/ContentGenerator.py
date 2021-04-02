@@ -224,6 +224,7 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                 jsonTemplate["headPara"] = Template(headPara[randrange(len(headPara))]).substitute(powerKeyword=powerKeyword)
                 versus1 = ""
                 versus2 = ""
+                versus3 = ""
                 if (car1.model_make_display == car2.model_make_display and car2.model_make_display == car3.model_make_display):
                     versus1 = car1.model_make_display +" "+car1.model_name+" vs "+car2.model_name
                     versus2 = car1.model_make_display +" "+car1.model_name+" vs "+car3.model_name
