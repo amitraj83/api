@@ -9,7 +9,7 @@ from ContentGenerator import getHTMLContent
 
 
 def main():
-    for i in range(1000, 16000):
+    for i in range(11897, 16000):
         connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
                                       database="daft")
         number = None
