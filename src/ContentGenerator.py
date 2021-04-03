@@ -80,7 +80,6 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
         row = [id, car_ids, criteria, json.loads(response), display_text, summary, page_title, other_data, url]
 
         blogTemplateFile = os.path.join(os.getcwd(),  "blog-template.json")
-        print("Blog Template File : "+blogTemplateFile)
         with open(blogTemplateFile, 'r') as tf:
             jsonTemplate = json.loads(tf.read())
 
@@ -92,157 +91,153 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
             carIDMap = {row[1][0]:car1,row[1][1]:car2,row[1][2]:car3}
 
 
-            htmlTemplateFile = os.path.join(os.getcwd(),  "template.html")
-            print(htmlTemplateFile)
-            with open(htmlTemplateFile, 'r') as f:
-                data = f.read()
-                template = Template(data)
-                jsonTemplate["title"] = row[6]
-                jsonTemplate["pageURL"] = urllib.parse.quote(row[8])
-                jsonTemplate["keywords"] = "Car, compare, compare cars, compare car specs, compare car features, compare engine specifications, compare Car side by side, car comparison tool, "
-                description = "Compare "
-                if car1:
-                    jsonTemplate["keywords"] += car1.model_make_display.title()  +", "
-                    description += car1.model_make_display.title()  + " vs "
-                if car2:
-                    jsonTemplate["keywords"] += car2.model_make_display.title()  + ", "
-                    description += car2.model_make_display.title() + " vs "
-                if car3:
-                    jsonTemplate["keywords"] += car3.model_make_display.title() + ", "
-                    description += car3.model_make_display.title() + " vs "
-                description += "side by side and find out which car is better. See full car specs and trims. Ranks cars to decide which car to buy"
-                jsonTemplate["description"] = description
 
-                rank1_car_name = ""
-                rank2_car_name = ""
-                rank3_car_name = ""
-                rank1Car = None
-                rank2Car = None
-                rank3Car = None
-                rankCars = {}
-                seen = set()
-                for i in range(len(row[3]['model_id'])):
+            jsonTemplate["title"] = row[6]
+            jsonTemplate["pageURL"] = urllib.parse.quote(row[8])
+            jsonTemplate["keywords"] = "Car, compare, compare cars, compare car specs, compare car features, compare engine specifications, compare Car side by side, car comparison tool, "
+            description = "Compare "
+            if car1:
+                jsonTemplate["keywords"] += car1.model_make_display.title()  +", "
+                description += car1.model_make_display.title()  + " vs "
+            if car2:
+                jsonTemplate["keywords"] += car2.model_make_display.title()  + ", "
+                description += car2.model_make_display.title() + " vs "
+            if car3:
+                jsonTemplate["keywords"] += car3.model_make_display.title() + ", "
+                description += car3.model_make_display.title() + " vs "
+            description += "side by side and find out which car is better. See full car specs and trims. Ranks cars to decide which car to buy"
+            jsonTemplate["description"] = description
+
+            rank1_car_name = ""
+            rank2_car_name = ""
+            rank3_car_name = ""
+            rank1Car = None
+            rank2Car = None
+            rank3Car = None
+            rankCars = {}
+            seen = set()
+            for i in range(len(row[3]['model_id'])):
+                rank = int(row[3]['rnk_consolidate_final'][str(i)])
+                carId = int(row[3]['model_id'][str(i)])
+                aCar = carIDMap.get(carId)
+                carName = str(aCar.model_year)+" "+aCar.model_make_display +" "+aCar.model_name
+                rankCars[str(rank)] = carName
+
+                if rank == int(min(row[3]['rnk_consolidate_final'].values())):
+                    jsonTemplate["image_car1"] = aCar.image
+                    jsonTemplate["carName1"] = carName
+                    seen.add(i)
+                    rank1_car_name = carName
+                    rank1Car = aCar
+
+                if rank == int(max(row[3]['rnk_consolidate_final'].values())):
+                    seen.add(i)
+                    jsonTemplate["image_car3"] = aCar.image
+                    jsonTemplate["carName3"] = carName
+                    rank3_car_name = carName
+                    rank3Car = aCar
+
+            for i in range(len(row[3]['model_id'])):
+                if not i in seen:
                     rank = int(row[3]['rnk_consolidate_final'][str(i)])
                     carId = int(row[3]['model_id'][str(i)])
                     aCar = carIDMap.get(carId)
-                    carName = str(aCar.model_year)+" "+aCar.model_make_display +" "+aCar.model_name
+                    carName = str(aCar.model_year) +" "+aCar.model_make_display +" "+aCar.model_name
                     rankCars[str(rank)] = carName
-
-                    if rank == int(min(row[3]['rnk_consolidate_final'].values())):
-                        jsonTemplate["image_car1"] = aCar.image
-                        jsonTemplate["carName1"] = carName
-                        seen.add(i)
-                        rank1_car_name = carName
-                        rank1Car = aCar
-
-                    if rank == int(max(row[3]['rnk_consolidate_final'].values())):
-                        seen.add(i)
-                        jsonTemplate["image_car3"] = aCar.image
-                        jsonTemplate["carName3"] = carName
-                        rank3_car_name = carName
-                        rank3Car = aCar
-
-                for i in range(len(row[3]['model_id'])):
-                    if not i in seen:
-                        rank = int(row[3]['rnk_consolidate_final'][str(i)])
-                        carId = int(row[3]['model_id'][str(i)])
-                        aCar = carIDMap.get(carId)
-                        carName = str(aCar.model_year) +" "+aCar.model_make_display +" "+aCar.model_name
-                        rankCars[str(rank)] = carName
-                        # TODO, rank is not always 1
-                        if rank == 2:
-                            jsonTemplate["image_car2"] = aCar.image
-                            jsonTemplate["carName2"] = carName
-                            rank2_car_name = carName
-                            rank2Car = aCar
+                    # TODO, rank is not always 1
+                    if rank == 2:
+                        jsonTemplate["image_car2"] = aCar.image
+                        jsonTemplate["carName2"] = carName
+                        rank2_car_name = carName
+                        rank2Car = aCar
 
 
-                jsonTemplate["line1"] = Template(line1[randrange(2)]).substitute(car1=rank1_car_name, car2=rank2_car_name, car3=rank3_car_name)
-                criteria = row[2]
-                criteria_rows = ""
-                line3Text = []
-                randomPositionForExternalLink = randrange(len(criteria))
-                line3H3Heading = []
-                line3H3HeadingExternalLink = []
-                for i in range(len(criteria)):
-                    otherData = row[7]
-                    displayName = criteria[i]["displayname"]
-                    colName = criteria[i]["col_name"]
-                    pref = "Lower the better"
-                    localHighestLowest = "Lowest"
-                    if criteria[i]["preference"].lower() == "false":
-                        pref = "Higher the better"
-                        localHighestLowest = "Highest"
-                    importance = importanceArray[int(criteria[0]["importance"]) - 1]
-                    criteria_rows += "<tr><td>"+displayName+"</td><td>"+pref+"</td><td>"+importance+"</td></tr>"
+            jsonTemplate["line1"] = Template(line1[randrange(2)]).substitute(car1=rank1_car_name, car2=rank2_car_name, car3=rank3_car_name)
+            criteria = row[2]
+            criteria_rows = ""
+            line3Text = []
+            randomPositionForExternalLink = randrange(len(criteria))
+            line3H3Heading = []
+            line3H3HeadingExternalLink = []
+            for i in range(len(criteria)):
+                otherData = row[7]
+                displayName = criteria[i]["displayname"]
+                colName = criteria[i]["col_name"]
+                pref = "Lower the better"
+                localHighestLowest = "Lowest"
+                if criteria[i]["preference"].lower() == "false":
+                    pref = "Higher the better"
+                    localHighestLowest = "Highest"
+                importance = importanceArray[int(criteria[0]["importance"]) - 1]
+                criteria_rows += "<tr><td>"+displayName+"</td><td>"+pref+"</td><td>"+importance+"</td></tr>"
 
-                    localRank1Car = None
-                    localRank2Car = None
-                    localRank3Car = None
-                    localCriteriaValue = None
-                    # otherData["rank_data"]["rnk_" + colName] = > {'0': 1.0, '1': 2.0, '2': 3.0}
+                localRank1Car = None
+                localRank2Car = None
+                localRank3Car = None
+                localCriteriaValue = None
+                # otherData["rank_data"]["rnk_" + colName] = > {'0': 1.0, '1': 2.0, '2': 3.0}
 
-                    values = otherData["rank_data"]["rnk_" + colName].values()
-                    if max(values) == min(values):
-                        localRank1Car = carIDMap.get(otherData["rank_data"]["model_id"]["0"])
-                        localCriteriaValue = json.loads(localRank1Car.toJSON())[colName]
-                        localRank2Car = carIDMap.get(otherData["rank_data"]["model_id"]["1"])
-                        localRank3Car = carIDMap.get(otherData["rank_data"]["model_id"]["2"])
-                    else:
-
-                        for n in range(len(otherData["rank_data"]["rnk_" + colName])):
-                            if otherData["rank_data"]["rnk_"+colName][str(n)] == min(values):
-                                localRank1Car = carIDMap.get(otherData["rank_data"]["model_id"][str(n)])
-                                localCriteriaValue = json.loads(localRank1Car.toJSON())[colName]
-
-                        for n in range(len(otherData["rank_data"]["rnk_" + colName])):
-                            if otherData["rank_data"]["rnk_" + colName][str(n)] == max(values):
-                                localRank3Car = carIDMap.get(otherData["rank_data"]["model_id"][str(n)])
-
-                    #for Line 3
-
-                    h3Heading = str(localRank1Car.model_year)+" "+localRank1Car.model_make_display+" "+localRank1Car.model_name+" specs - "+displayName
-                    line3H3Heading.append(h3Heading)
-                    if i == randomPositionForExternalLink:
-                        line3H3HeadingExternalLink.append(randomExternalLink(localRank1Car.model_make_display))
-                    else:
-                        line3H3HeadingExternalLink.append("")
-                    line3Text.append(Template(line3[randrange(2)]).substitute(h3Heading=h3Heading,criteria=displayName, car1=str(car1.model_year)+" "+car1.model_make_display +" "+car1.model_name, \
-                                                               car2=str(car2.model_year)+" "+car2.model_make_display +" "+car2.model_name,\
-                                                               car3=str(car3.model_year)+" "+car3.model_make_display +" "+car3.model_name,\
-                                                               criteriaValueCar1=str(json.loads(car1.toJSON())[criteria[i]["col_name"]]), \
-                                                               criteriaValueCar2=str(json.loads(car2.toJSON())[criteria[i]["col_name"]]), \
-                                                               criteriaValueCar3=str(json.loads(car3.toJSON())[criteria[i]["col_name"]]), \
-                                                               givenPreference=pref, carWithRank1=str(localRank1Car.model_year)+" "+localRank1Car.model_make_display+" "+localRank1Car.model_name, \
-                                                                rank1CriteriaValue=localCriteriaValue, highestOrLowest=localHighestLowest, importanceDescription=importance, \
-                                                                carWithRank3=str(localRank3Car.model_year)+" "+localRank3Car.model_make_display+" "+localRank3Car.model_name
-                                                               ))
-
-                jsonTemplate["line3"] = line3Text
-                jsonTemplate["line3H3Heading"] = line3H3Heading
-                jsonTemplate["line3H3HeadingExternalLink"] = line3H3HeadingExternalLink
-                jsonTemplate["criteria_rows"] = criteria_rows
-                jsonTemplate["headPara"] = Template(headPara[randrange(len(headPara))]).substitute(powerKeyword=powerKeyword)
-                versus1 = ""
-                versus2 = ""
-                versus3 = ""
-                if (car1.model_make_display == car2.model_make_display and car2.model_make_display == car3.model_make_display):
-                    versus1 = car1.model_make_display +" "+car1.model_name+" vs "+car2.model_name
-                    versus2 = car1.model_make_display +" "+car1.model_name+" vs "+car3.model_name
-                    versus3 = car1.model_make_display +" "+car2.model_name+" vs "+car3.model_name
+                values = otherData["rank_data"]["rnk_" + colName].values()
+                if max(values) == min(values):
+                    localRank1Car = carIDMap.get(otherData["rank_data"]["model_id"]["0"])
+                    localCriteriaValue = json.loads(localRank1Car.toJSON())[colName]
+                    localRank2Car = carIDMap.get(otherData["rank_data"]["model_id"]["1"])
+                    localRank3Car = carIDMap.get(otherData["rank_data"]["model_id"]["2"])
                 else:
-                    versus1 = car1.model_make_display + " " + car1.model_name + " vs " +car2.model_make_display + " " + car2.model_name
-                    versus2 = car1.model_make_display + " " + car1.model_name + " vs " +car3.model_make_display + " " + car3.model_name
-                    versus3 = car2.model_make_display + " " + car2.model_name + " vs " +car3.model_make_display + " " + car3.model_name
-                jsonTemplate["line4"] = Template(line4[randrange(2)]).substitute(carNameWithRank1=rank1_car_name, versus1=versus1, versus2=versus2, versus3=versus3)
 
-                listOfKey = [car1.model_make_display, car1.model_name, car2.model_make_display, car2.model_name, car3.model_make_display, car3.model_name]
-                relatedLinksData = getRelatedLinks(listOfKey)
+                    for n in range(len(otherData["rank_data"]["rnk_" + colName])):
+                        if otherData["rank_data"]["rnk_"+colName][str(n)] == min(values):
+                            localRank1Car = carIDMap.get(otherData["rank_data"]["model_id"][str(n)])
+                            localCriteriaValue = json.loads(localRank1Car.toJSON())[colName]
 
-                count += 1
-                # print("generate: " + str(substitutedData))
-                f.close()
-                return {"jsonTemplate":jsonTemplate, "relatedLinks":relatedLinksData }
+                    for n in range(len(otherData["rank_data"]["rnk_" + colName])):
+                        if otherData["rank_data"]["rnk_" + colName][str(n)] == max(values):
+                            localRank3Car = carIDMap.get(otherData["rank_data"]["model_id"][str(n)])
+
+                #for Line 3
+
+                h3Heading = str(localRank1Car.model_year)+" "+localRank1Car.model_make_display+" "+localRank1Car.model_name+" specs - "+displayName
+                line3H3Heading.append(h3Heading)
+                if i == randomPositionForExternalLink:
+                    line3H3HeadingExternalLink.append(randomExternalLink(localRank1Car.model_make_display))
+                else:
+                    line3H3HeadingExternalLink.append("")
+                line3Text.append(Template(line3[randrange(2)]).substitute(h3Heading=h3Heading,criteria=displayName, car1=str(car1.model_year)+" "+car1.model_make_display +" "+car1.model_name, \
+                                                           car2=str(car2.model_year)+" "+car2.model_make_display +" "+car2.model_name,\
+                                                           car3=str(car3.model_year)+" "+car3.model_make_display +" "+car3.model_name,\
+                                                           criteriaValueCar1=str(json.loads(car1.toJSON())[criteria[i]["col_name"]]), \
+                                                           criteriaValueCar2=str(json.loads(car2.toJSON())[criteria[i]["col_name"]]), \
+                                                           criteriaValueCar3=str(json.loads(car3.toJSON())[criteria[i]["col_name"]]), \
+                                                           givenPreference=pref, carWithRank1=str(localRank1Car.model_year)+" "+localRank1Car.model_make_display+" "+localRank1Car.model_name, \
+                                                            rank1CriteriaValue=localCriteriaValue, highestOrLowest=localHighestLowest, importanceDescription=importance, \
+                                                            carWithRank3=str(localRank3Car.model_year)+" "+localRank3Car.model_make_display+" "+localRank3Car.model_name
+                                                           ))
+
+            jsonTemplate["line3"] = line3Text
+            jsonTemplate["line3H3Heading"] = line3H3Heading
+            jsonTemplate["line3H3HeadingExternalLink"] = line3H3HeadingExternalLink
+            jsonTemplate["criteria_rows"] = criteria_rows
+            jsonTemplate["headPara"] = Template(headPara[randrange(len(headPara))]).substitute(powerKeyword=powerKeyword)
+            versus1 = ""
+            versus2 = ""
+            versus3 = ""
+            if (car1.model_make_display == car2.model_make_display and car2.model_make_display == car3.model_make_display):
+                versus1 = car1.model_make_display +" "+car1.model_name+" vs "+car2.model_name
+                versus2 = car1.model_make_display +" "+car1.model_name+" vs "+car3.model_name
+                versus3 = car1.model_make_display +" "+car2.model_name+" vs "+car3.model_name
+            else:
+                versus1 = car1.model_make_display + " " + car1.model_name + " vs " +car2.model_make_display + " " + car2.model_name
+                versus2 = car1.model_make_display + " " + car1.model_name + " vs " +car3.model_make_display + " " + car3.model_name
+                versus3 = car2.model_make_display + " " + car2.model_name + " vs " +car3.model_make_display + " " + car3.model_name
+            jsonTemplate["line4"] = Template(line4[randrange(2)]).substitute(carNameWithRank1=rank1_car_name, versus1=versus1, versus2=versus2, versus3=versus3)
+
+            listOfKey = [car1.model_make_display, car1.model_name, car2.model_make_display, car2.model_name, car3.model_make_display, car3.model_name]
+            relatedLinksData = getRelatedLinks(listOfKey)
+
+            count += 1
+            # print("generate: " + str(substitutedData))
+
+            return {"jsonTemplate":jsonTemplate, "relatedLinks":relatedLinksData }
 
         # print("Total Generated: "+str(count))
     except (Exception, psycopg2.Error) as error:

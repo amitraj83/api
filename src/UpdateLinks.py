@@ -20,7 +20,6 @@ def main():
 
         for row in records:
             id = row[0]
-            print(id)
             carsRequest = row[1]
             rank_json = json.dumps(row[3])
             versus = row[4]
