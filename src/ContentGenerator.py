@@ -16,8 +16,7 @@ headPara = ["$powerKeyword is definitely an amazing car. Some of the $powerKeywo
 
 line1 = ["In this blog, we will compare $car1 specs, $car2 specs and $car3 specs, and find out which one is good and why?","In this blog, lets compare $car1 specs, $car2 specs and $car3 specs, and understand which car is better and which car to buy. We will compare all specs and trims and rank cars to suit your needs."]
 line3 = ["During the $car1 review for $criteria, we found that $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n                        Because given preference is $givenPreference, it comes out that $carWithRank1 is the best because it has $criteria as $rank1CriteriaValue which is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3\n.","Lets do $car1 review to understand if this is the best based on $criteria. $car1 has $criteriaValueCar1 , $car2 has $criteriaValueCar2 and $car3 has $criteriaValueCar3.\n It was mentioned that  $criteria is $givenPreference. So, $carWithRank1 seems better than the other two cars because its $rank1CriteriaValue is $highestOrLowest from others. And because\nyou have mentioned that $criteria is $importanceDescription, its $carWithRank1 weighted rank is 1 where as weighted rank of $carWithRank3 is 3.\n"]
-line3H3Heading = []
-line3H3HeadingExternalLink = []
+
 line4 = ["During our car comparison, we compared $versus1, $versus2 and $versus3. In this car comparison, we calculate the final rank of cars by adding all the weighted ranks of each criteria. This car comparison shows that $carNameWithRank1 stands out to be the best one becuase your important \ncriteria are best matched in this car.","In this car comparison and ranking, we compared $versus1, $versus2 and $versus3. We use the importance of each criteria mentioned. When we add weighted ranks, $carNameWithRank1 seems to be the best one among others because the mentioned criteria are best matched in this car."]
 
 
@@ -163,6 +162,8 @@ def getHTMLContent(id, car_ids, criteria, response, display_text, summary, page_
                 criteria_rows = ""
                 line3Text = []
                 randomPositionForExternalLink = randrange(len(criteria))
+                line3H3Heading = []
+                line3H3HeadingExternalLink = []
                 for i in range(len(criteria)):
                     otherData = row[7]
                     displayName = criteria[i]["displayname"]

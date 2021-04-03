@@ -78,3 +78,17 @@ H2 use
 H3 use
 
 
+Work to do:
+create table car_external_links
+import data on the postgres
+add columns to the car_links
+
+Git pull on server
+
+restart gui and api
+run the update content python script
+
+update the sitemap
+
+pg_dump --host localhost --port 5432 --username postgres --format plain --verbose --file "car-links-2-4-2021.bak" --table cars.car_links daft
+
