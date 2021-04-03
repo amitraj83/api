@@ -16,7 +16,7 @@ def main():
         #, rankCriteria, rank_json, versus, category, all_ranks_json
         try:
             cursor = connection.cursor()
-            cursor.execute("select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where other_data::text != '{}' and criteria::text != '[]' order by id asc offset "+i+" limit 1")
+            cursor.execute("select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where other_data::text != '{}' and criteria::text != '[]' order by id asc offset "+str(i)+" limit 1")
             records = cursor.fetchall()
 
             for row in records:
