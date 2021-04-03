@@ -15,7 +15,7 @@ def main():
     #, rankCriteria, rank_json, versus, category, all_ranks_json
     try:
         cursor = connection.cursor()
-        cursor.execute("select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where other_data::text != '{}' and criteria::text != '[]'")
+        cursor.execute("select id, car_ids, criteria, response, display_text, summary, page_title, other_data, url from cars.car_links where other_data::text != '{}' and criteria::text != '[]' order by id asc offset 0 limit 500")
         records = cursor.fetchall()
 
         for row in records:
@@ -40,7 +40,7 @@ def main():
             postgres_update_query = ' UPDATE cars.car_links  SET  summary=%s, page_title=%s, other_data=%s, keywords=%s, powerkeyword=%s WHERE id = %s; '
             record_to_update = (metaData['description'], metaData['title'], json.dumps((otherData)), ', '.join(metaData['keywords']), metaData['powerKeyword'], id,)
 
-            cursor.execute(postgres_update_query, record_to_update)
+            cursor2.execute(postgres_update_query, record_to_update)
 
 
     except (Exception, psycopg2.Error) as error:
@@ -49,6 +49,7 @@ def main():
         if (connection):
             connection.commit()
             cursor.close()
+            cursor2.close()
             connection.close()
             print("PostgreSQL connection is closed")
 
