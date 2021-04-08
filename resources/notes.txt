@@ -1,0 +1,11 @@
+To find all model used
+select distinct c.model_make_id from cars.car_links l JOIN cars.car c ON c.model_id = ANY(l.car_ids) order by  model_make_id offset 0 LIMIT 100
+
+
+psql output to file
+[wist@scifres ~]$ psql db
+Welcome to psql 8.3.6, the PostgreSQL interactive terminal
+
+db=>\o out.txt
+db=>\dt
+db=>\q
