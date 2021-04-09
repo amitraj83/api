@@ -29,6 +29,10 @@ def main():
                 count = int(cursor2.fetchone()[0])
                 if count != 3:
                     f.write('{},{}\r\n'.format(row[1], row[2]))
+                    cursor3 = connection.cursor()
+                    cursor3.execute(" delete from cars.car_links where id = "+str(row[1]))
+                    cursor3.close()
+                cursor2.close()
         f.close()
     except (Exception, psycopg2.Error) as error:
         print("Error reading data from MySQL table", error)
