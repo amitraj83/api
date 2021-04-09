@@ -208,7 +208,7 @@ def insertLink(carsRequest, rankCriteria, rank_json, versus, category, all_ranks
         record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, versus, metaData['description'], metaData['title'], json.dumps((otherData)), url, ', '.join(metaData['keywords']), metaData['powerKeyword'],)
 
 
-        cursor.execute(postgres_insert_query, record_to_insert)
+        #cursor.execute(postgres_insert_query, record_to_insert)
 
         return url
     except (Exception, psycopg2.Error) as error:

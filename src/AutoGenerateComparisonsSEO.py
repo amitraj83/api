@@ -15,16 +15,42 @@ def main():
         while count < 5000 and totalIterations < 50000:
             totalIterations += 1
             # print("Total Iterations: ", totalIterations)
-
-            year = yearsArray[randrange(len(yearsArray) - 1)]
-            make = makesArray[randrange(len(makesArray) - 1)]
-            print(make)
-            sqlQuery = "select model_id from cars.car where model_make_id = '"+make+"' and model_year = "+str(year)+"  ORDER BY RANDOM() LIMIT 3;"
-            cursor.execute(sqlQuery)
-            records = cursor.fetchall()
+            make1 = ""
+            make2 = ""
+            make3 = ""
+            selectedModelID1 = None
+            selectedModelID2 = None
+            selectedModelID3 = None
             listOfCars = []
-            for row in records:
-                listOfCars.append(row[0])
+            while selectedModelID1 == None or selectedModelID2 == None or selectedModelID3 == None:
+                listOfCars = []
+                while make1 == make2 or make2 == make3 or make3 == make1:
+                    make1 = makesArray[randrange(len(makesArray) - 1)]
+                    make2 = makesArray[randrange(len(makesArray) - 1)]
+                    make3 = makesArray[randrange(len(makesArray) - 1)]
+                year = yearsArray[randrange(len(yearsArray) - 1)]
+
+                sqlQuery1 = "select model_id from cars.car where model_make_display ilike '"+make1+"'  and model_year = "+str(year)+" ORDER BY RANDOM() LIMIT 1"
+                sqlQuery2 = "select model_id from cars.car where model_make_display ilike '"+make2+"'  and model_year = "+str(year)+" ORDER BY RANDOM() LIMIT 1"
+                sqlQuery3 = "select model_id from cars.car where model_make_display ilike '"+make3+"'  and model_year = "+str(year)+" ORDER BY RANDOM() LIMIT 1"
+
+                cursor.execute(sqlQuery1)
+                selectedModelID1 = cursor.fetchone()
+                if selectedModelID1 == None:
+                    continue
+                listOfCars.append(selectedModelID1[0])
+                cursor.execute(sqlQuery2)
+                selectedModelID2 = cursor.fetchone()
+                if selectedModelID2 == None:
+                    continue
+                listOfCars.append(selectedModelID2[0])
+                cursor.execute(sqlQuery3)
+                selectedModelID3 = cursor.fetchone()
+                if selectedModelID3 == None:
+                    continue
+                listOfCars.append(selectedModelID3[0])
+
+
             carsCheckStr = "'{"
             COMMA = ","
             for j in range(len(listOfCars)):
