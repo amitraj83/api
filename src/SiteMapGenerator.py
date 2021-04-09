@@ -15,8 +15,8 @@ def main():
         sqlQuery = " select url FROM cars.car_links  order by car_links.id desc LIMIT 11000 "
         cursor.execute(sqlQuery)
         records = cursor.fetchall()
-        dt = "2021-03-05T12:10:13+00:00"
-        sitemap = open("/root/car-compare/ui/public/sitemap-2021-03-05.xml", "w+")
+        dt = "2021-09-09T12:10:13+00:00"
+        sitemap = open("/root/car-compare/ui/public/sitemap2.xml", "w+")
         sitemap.write("<?xml version = \"1.0\" encoding = \"UTF-8\" ?>\n")
         sitemap.write("<urlset\n")
         sitemap.write("xmlns = \"http://www.sitemaps.org/schemas/sitemap/0.9\"\n")
