@@ -6,9 +6,6 @@
     "carName2":"",
     "carName3":"",
   "description": "Compare three cars side by side and rank them according to your preferences. Compare car specs and find out the best car for you. User our free car comparison tool.",
-  "stars_car1": "<i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i>",
-  "stars_car2": "<i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i>",
-  "stars_car3": "<i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i>",
   "image_car1": "002_o_2015.jpg",
   "image_car2": "002_o_2015.jpg",
   "image_car3": "002_o_2015.jpg",
@@ -19,5 +16,6 @@
   "line4": "",
   "footer_links": "",
   "headPara": "",
-  "line3H3Heading": ""
+  "line3H3Heading": "",
+  "h2Heading": ""
 }

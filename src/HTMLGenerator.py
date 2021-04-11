@@ -165,7 +165,6 @@ def main():
                         rankCars[str(rank)] = carName
 
                         if rank == int(min(row[3]['rnk_consolidate_final'].values())):
-                            jsonTemplate["stars_car1"] = "<i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i><i class=\"fas fa-star\"></i>"
                             jsonTemplate["image_car1"] = aCar.image
                             jsonTemplate["carName1"] = carName
                             seen.add(i)
@@ -174,7 +173,6 @@ def main():
 
                         if rank == int(max(row[3]['rnk_consolidate_final'].values())):
                             seen.add(i)
-                            jsonTemplate["stars_car3"] = "<i class=\"fas fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i><i class=\"far fa-star\"></i>"
                             jsonTemplate["image_car3"] = aCar.image
                             jsonTemplate["carName3"] = carName
                             rank3_car_name = carName

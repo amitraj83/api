@@ -202,13 +202,15 @@ def insertLink(carsRequest, rankCriteria, rank_json, versus, category, all_ranks
         postgres_insert_query += " (id, car_ids, criteria, response, display_text, summary, page_title, other_data, url, keywords, powerKeyword) "
         postgres_insert_query += " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s , %s, %s, %s )"
 
-        url = "/compare/" + category + "/" + str(number[0]) + "/" + versus
         metaData = generateSEOTitleDescriptionKeywords(all_ranks_json)
-        otherData = {"rank_data":json.loads(all_ranks_json), "blog_content":getHTMLContent(number[0], carsRequest, rankCriteria, rank_json, versus, versus, versus, {"rank_data":json.loads(all_ranks_json)}, url, metaData['keywords'], metaData['powerKeyword'])}
-        record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, versus, metaData['description'], metaData['title'], json.dumps((otherData)), url, ', '.join(metaData['keywords']), metaData['powerKeyword'],)
+        powerKeyword = metaData['powerKeyword']
+
+        url = "/compare/" + category + "/" + str(number[0]) + "/" + powerKeyword.replace(" ", "-")
+        otherData = {"rank_data":json.loads(all_ranks_json), "blog_content":getHTMLContent(number[0], carsRequest, rankCriteria, rank_json, versus, versus, versus, {"rank_data":json.loads(all_ranks_json)}, url, metaData['keywords'], powerKeyword)}
+        record_to_insert = (number[0], (carsRequest,), json.dumps(rankCriteria), rank_json, versus, metaData['description'], metaData['title'], json.dumps((otherData)), url, ', '.join(metaData['keywords']), powerKeyword,)
 
 
-        #cursor.execute(postgres_insert_query, record_to_insert)
+        cursor.execute(postgres_insert_query, record_to_insert)
 
         return url
     except (Exception, psycopg2.Error) as error:
