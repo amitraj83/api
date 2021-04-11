@@ -18,4 +18,12 @@ daft=# select id from cars.car_links order by id desc LIMIT 1;
 -------
  11896
 (1 row)
+postgres=# \c daft
+You are now connected to database "daft" as user "postgres".
+daft=# select count(*) from cars.car_links ;
+ count
+-------
+ 12265
+(1 row)
+
 

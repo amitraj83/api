@@ -12,10 +12,10 @@ def main():
                                   database="daft")
     try:
         cursor = connection.cursor()
-        sqlQuery = " select url FROM cars.car_links  order by car_links.id desc LIMIT 11000 "
+        sqlQuery = " select url FROM cars.car_links where id > 11896  order by car_links.id asc  "
         cursor.execute(sqlQuery)
         records = cursor.fetchall()
-        dt = "2021-09-09T12:10:13+00:00"
+        dt = "2021-04-21T12:10:13+00:00"
         sitemap = open("/root/car-compare/ui/public/sitemap2.xml", "w+")
         sitemap.write("<?xml version = \"1.0\" encoding = \"UTF-8\" ?>\n")
         sitemap.write("<urlset\n")
