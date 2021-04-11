@@ -9,3 +9,13 @@ Welcome to psql 8.3.6, the PostgreSQL interactive terminal
 db=>\o out.txt
 db=>\dt
 db=>\q
+
+On date - 11/04/2021
+postgres=# \c daft
+You are now connected to database "daft" as user "postgres".
+daft=# select id from cars.car_links order by id desc LIMIT 1;
+  id
+-------
+ 11896
+(1 row)
+
