@@ -125,10 +125,11 @@ def main():
                     # print(str(listOfCars))
                     response = requests.post('http://localhost:5000/api/compare/cars', data='{"criteria":[{"id":880,"col_name":"model_year","displayname":"Model Year","preference":"False","importance":"5"},{"id":8900,"col_name":"model_engine_cc","displayname":"Engine size (cc)","preference":"False","importance":"5"},{"id":6294,"col_name":"model_engine_cyl","displayname":"Engine Cylinder","preference":"False","importance":"3"},{"id":367,"col_name":"model_engine_power_rpm","displayname":"Engine power (rpm)","preference":"False","importance":"2"},{"id":8245,"col_name":"model_engine_torque_rpm","displayname":"Engine Torque (rpm)","preference":"False","importance":"2"},{"id":1234,"col_name":"model_seats","displayname":"Seats","preference":"True","importance":"4"},{"id":4567,"col_name":"model_doors","displayname":"Doors","preference":"True","importance":"3"},{"id":765,"col_name":"model_width_mm","displayname":"Width (mm)","preference":"True","importance":"5"},{"id":3756,"col_name":"model_height_mm","displayname":"Height (mm)","preference":"True","importance":"5"}],"cars":'+str(listOfCars)+'}')
                     count += 1
-                    print(count)
-                    quit(0)
+                    #print(count)
+                    #quit(0)
                     #print(response.json())
                     # print(count)
+            cursor2.close()
             print("Total Comparisons: ", count, totalIterations)
     except (Exception, psycopg2.Error) as error:
         print("Error: ", error)
