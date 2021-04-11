@@ -52,7 +52,7 @@ def main():
                         "ferrari":["ferrari", "Lamborghini","McLaren", "ferrari", "Porsche", "bugatti", "tesla", "Ford"]
                         }
         cursor = connection.cursor()
-        cursor2 = connection.cursor()
+
         count = 0
         totalIterations = 0;
         while count < 5000 and totalIterations < 50000:
@@ -115,6 +115,7 @@ def main():
             carsCheckStr += "}'"
             carsCheckQuery = " select count(*) as found  from cars.car_links where car_ids::text = "+carsCheckStr+" "
             # print(carsCheckQuery)
+            cursor2 = connection.cursor()
             cursor2.execute(carsCheckQuery)
             carCheckRecords = cursor2.fetchall()
             if carCheckRecords[0] and int(carCheckRecords[0][0]) > 0:
