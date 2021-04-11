@@ -77,6 +77,7 @@ def main():
                             make2 = counterCarsArray[randrange(len(counterCarsArray)-1)]
                             make3 = counterCarsArray[randrange(len(counterCarsArray)-1)]
                     else:
+                        make1 = None
                         continue
                 year = yearsArray[randrange(len(yearsArray) - 1)]
 
@@ -87,22 +88,26 @@ def main():
                 cursor.execute(sqlQuery1)
                 selectedModelID1 = cursor.fetchone()
                 if selectedModelID1 == None:
+                    make1 = None
                     continue
                 listOfCars.append(selectedModelID1[0])
                 cursor.execute(sqlQuery2)
                 selectedModelID2 = cursor.fetchone()
                 if selectedModelID2 == None:
+                    make1 = None
                     continue
                 listOfCars.append(selectedModelID2[0])
                 cursor.execute(sqlQuery3)
                 selectedModelID3 = cursor.fetchone()
                 if selectedModelID3 == None:
+                    make1 = None
                     continue
                 listOfCars.append(selectedModelID3[0])
                 if selectedModelID1[1] == selectedModelID2[1] or selectedModelID2[1] == selectedModelID3[1] or selectedModelID3[1] == selectedModelID1[1]:
                     selectedModelID3 = None
                     selectedModelID2 = None
                     selectedModelID1 = None
+                    make1 = None
                     continue
 
 
