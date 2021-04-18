@@ -29,6 +29,9 @@ titles = ["Checkout why $rank1car is better than $rank2car",
 
 numberList = [1,2,3,4,5]
 
+tweetMessages = ["What do you think about this car. Please like it and follow me.", "See this cool car. Please like it, retweet and follow me.", "If you did not see this, you did not see anything. Please like it, retweet and follow me.", "This is cool. Isn't? Please like it, retweet and follow me.", "Did you like this car? Please retweet and follow me.", "Don't click on this pic. it will blow your mind. ", "This is one of my favourites. Please like it, retweet and follow me.", "This is a rare pic. Please like it and follow me. "]
+
+
 def getImageUrl(cid):
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
                                   database="daft")
@@ -115,7 +118,7 @@ def main():
                 if (randomSelect == 2 or randomSelect == 3 or randomSelect == 4) and len(os.listdir("/root/images-for-twitter")) > 0:
                     randomFile = random.choice(os.listdir("/root/images-for-twitter"))
                     print(randomFile)
-                    api.update_with_media(os.path.join("/root/images-for-twitter",randomFile ) , "Checkout this pic. Like it and please follow me.")
+                    api.update_with_media(os.path.join("/root/images-for-twitter",randomFile ) , random.choice(tweetMessages) +" #cars #car #newcar")
                     os.remove(os.path.join("/root/images-for-twitter",randomFile ))
                 else:
                     witterResponseStatus = api.update_status(twitterStatus)
