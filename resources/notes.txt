@@ -25,5 +25,89 @@ daft=# select count(*) from cars.car_links ;
 -------
  12265
 (1 row)
+#
 
+
+
+Best specs:
+https://www.caranddriver.com/alfa-romeo/giulia/specs
+https://www.carfolio.com/chrysler-300s-722128
+
+
+
+cd /c/house-idea/code/api/src/util/approved
+scp * root@178.62.52.68:/root/images-for-twitter
+rm -rf *
+
+
+
+
+
+
+
+
+
+
+
+
+Using the ahref APIs, find out the best keyword.
+Put that keyword in the title.
+Make title emotional
+
+
+URls must be maximum 75 character long =
+https://suggestrank.com/cars/mercedes/benz/slk/2008/24345/mercedes/benz/c/
+
+
+//*[@id="root"]/div/div/main/div/div[2]/div/div[2]/div[2]/div[2]/table/tbody[1]/tr[1]/td[2]/div/div/a/div
+
+
+
+strategy:
+Find out make and model name
+search on ahrefs
+Find out top keyword
+Find out other five keywords
+
+TItle => year {top keyword} - 9 awesome specs and reviews
+Description => 9 awesome specs that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+
+TItle => year {top keyword} - 9 unbelievable specs and reviews
+Description => 9 unbelievable specs that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+
+TItle => year {top keyword} - 9 amazing specs and reviews
+Description => 9 amazing specs that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+
+TItle => year {top keyword} - 9 facts making it great car
+Description => 9 amazing facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+
+TItle => year {top keyword} - 9 facts making it the best car
+Description => 9 amazing facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+
+TItle => year {top keyword} - Don't miss these 9 facts
+Description => 9 awesome facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+
+TItle => year {top keyword} - 9 amazing reasons to buy this car
+Description => 9 amazing reasons that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+
+TItle => year {top keyword} - 9 amazing facts to buy this car
+Description => 9 amazing facts that makes Mercedes Benz SLK better than others. View Mercedes Benz SLK full specs, reviews and comparison before buying used cars for sale.
+
+
+Meta description =>
+
+Content => use year in ()
+
+
+Use the title above in alt of primage image. Use description above in the primary image.
+
+
+
+User h2 or h3 title
+
+
+https://www.motortrend.com/sitemap_index.xml
+https://www.parkers.co.uk/sitemap.xml
+https://www.autoblog.com/cars-for-sale/sitemap_index.xml.gz
+https://jalopnik.com/sitemap.xml
 
