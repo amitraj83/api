@@ -29,7 +29,7 @@ def getThreeBlogsLInks():
                                  d[1][random.randrange(len(d[1]))])
         randomFile = random.choice(os.listdir(randomDir))
         shutil.move(os.path.join(randomDir, randomFile), os.path.join(os.path.abspath(os.getcwd()), "static",randomFile))
-        return render_template('mytemplate.html', imgSrc=randomDir+"-"+randomFile)
+        return render_template('mytemplate.html', imgSrc=randomFile)
     else:
         return "<html><body>No image found. try again</body></html>"
     # image = random.choice(os.listdir(os.path.join(os.path.abspath(os.getcwd()), "static")))
