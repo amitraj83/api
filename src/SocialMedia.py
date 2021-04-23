@@ -2,11 +2,13 @@ import psycopg2
 import json
 from string import Template
 from random import randrange
+import os
 import yaml
 import urllib
 import urllib.parse
 import tweepy
 import requests
+import random
 from datetime import datetime
 import logging
 logging.basicConfig(filename='/var/log/social.log',  format='%(asctime)s %(message)s', level=logging.INFO)
@@ -24,6 +26,11 @@ titles = ["Checkout why $rank1car is better than $rank2car",
 "Compare and Rank $rank1car, $rank2car and $rank3car",
 "Checkout why $rank1car is better than $rank2car and $rank3car"
 ]
+
+numberList = [1,2,3,4,5]
+
+tweetMessages = ["What do you think about this car. Please like it and follow me.", "See this cool car. Please like it, retweet and follow me.", "If you did not see this, you did not see anything. Please like it, retweet and follow me.", "This is cool. Isn't? Please like it, retweet and follow me.", "Did you like this car? Please retweet and follow me.", "Don't click on this pic. it will blow your mind. ", "This is one of my favourites. Please like it, retweet and follow me.", "This is a rare pic. Please like it and follow me. "]
+
 
 def getImageUrl(cid):
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
@@ -106,8 +113,16 @@ def main():
                 auth = tweepy.OAuthHandler(consumer_key, consumer_secret_key)
                 auth.set_access_token(access_token, access_token_secret)
                 api = tweepy.API(auth)
-                witterResponseStatus = api.update_status(twitterStatus)
-                logging.info("Twitter status: "+str(url))
+                randomSelect = random.choice(numberList)
+                print(randomSelect)
+                if (randomSelect == 2 or randomSelect == 3 or randomSelect == 4) and len(os.listdir("/root/images-for-twitter")) > 0:
+                    randomFile = random.choice(os.listdir("/root/images-for-twitter"))
+                    print(randomFile)
+                    api.update_with_media(os.path.join("/root/images-for-twitter",randomFile ) , random.choice(tweetMessages) +" #cars #car #newcar")
+                    os.remove(os.path.join("/root/images-for-twitter",randomFile ))
+                else:
+                    witterResponseStatus = api.update_status(twitterStatus)
+                    logging.info("Twitter status: "+str(url))
                 # print(str(twitterStatus))
             else:
                 fbUrl = 'https://graph.facebook.com/v10.0/104277171736451/feed?message='+urllib.parse.quote(title)+' '+urllib.parse.quote(hashTags)+'&link='+url+'&access_token='+fbAccessToken
