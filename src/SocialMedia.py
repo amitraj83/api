@@ -32,7 +32,8 @@ titles = ["Checkout why $rank1car is better than $rank2car",
 
 numberList = [1,2,3,4,5]
 
-subreddits = ["u_suggestrank", "carporn", "cars", "car"]
+subreddits = ["u_suggestrank", "carporn",  "car"]
+#cars does not allow the image posting. We should only post questions.
 
 reddit = praw.Reddit(
     client_id="utcpaWWt5u9GFg",
