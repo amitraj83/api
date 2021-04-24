@@ -32,7 +32,7 @@ titles = ["Checkout why $rank1car is better than $rank2car",
 
 numberList = [1,2,3,4,5]
 
-subreddits = ["u_suggestrank", "carporn", "cars", "car", "Cartalk"]
+subreddits = ["u_suggestrank", "carporn", "cars", "car"]
 
 reddit = praw.Reddit(
     client_id="utcpaWWt5u9GFg",
@@ -43,7 +43,7 @@ reddit = praw.Reddit(
 )
 
 tweetMessages = ["What do you think about this car. Please like it and follow me.", "See this cool car. Please like it, retweet and follow me.", "If you did not see this, you did not see anything. Please like it, retweet and follow me.", "This is cool. Isn't? Please like it, retweet and follow me.", "Did you like this car? Please retweet and follow me.", "Don't click on this pic. it will blow your mind. ", "This is one of my favourites. Please like it, retweet and follow me.", "This is a rare pic. Please like it and follow me. "]
-redditMessages = ["Check out this beautiful car.", "Do you like this car?", "See this amazing beauty. You will like it.", "Can you tell me why should I buy this car?", "Please suggest why its a good car?", "This is a cool car. Check this out. ", "What do you think about the engine size of this car?", "More and small cylinders gives better power and smooth drive. Do you agree?", "Big engine is not always good, more cylinders are preferred.", "Reply me if this is your dream car?", "Do you own this car?"]
+redditMessages = ["Check out this beautiful car.", "Do you like this car?", "See this amazing beauty. Do you like it.", "Can you tell me why should I buy this car?", "Please suggest why its a good car?", "This is a cool car. Check this out. ", "What do you think about the engine size of this car?", "More and small cylinders gives better power and smooth drive. Do you agree?", "Big engine is not always good, more cylinders are preferred. Am I correct?", "Is this your dream car?", "Do you own this car?"]
 
 def getImageUrl(cid):
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
@@ -108,9 +108,10 @@ def main():
 
         randomImageFile = random.choice(os.listdir("/root/images-for-twitter"))
         randomSubReddit = random.choice(subreddits)
+        print("Reddit posted to : " + randomSubReddit)
         reddit.subreddit(randomSubReddit).submit_image(random.choice(redditMessages),
                                                        image_path=os.path.join("/root/images-for-twitter",randomImageFile ))
-        print("Reddit posted to : "+randomSubReddit)
+
 
 
         dataList = getData()
