@@ -109,14 +109,14 @@ def main():
 
         randomImageFile = random.choice(os.listdir("/root/images-for-twitter"))
         spllittedName = randomImageFile.split("$$")
-        if len(spllittedName) > 1:
-            randomMessage = random.choice(redditMessages)
-            modelName = spllittedName[0]
-            newMessage = Template(randomMessage).substitute(modelName=modelName)
-            randomSubReddit = random.choice(subreddits)
-            print("Reddit posted to : " + randomSubReddit)
-            reddit.subreddit(randomSubReddit).submit_image(newMessage,
-                                                       image_path=os.path.join("/root/images-for-twitter",randomImageFile ))
+        # if len(spllittedName) > 1:
+        #     randomMessage = random.choice(redditMessages)
+        #     modelName = spllittedName[0]
+        #     newMessage = Template(randomMessage).substitute(modelName=modelName)
+        #     randomSubReddit = random.choice(subreddits)
+        #     print("Reddit posted to : " + randomSubReddit)
+        #     reddit.subreddit(randomSubReddit).submit_image(newMessage,
+        #                                                image_path=os.path.join("/root/images-for-twitter",randomImageFile ))
 
 
 
