@@ -146,7 +146,11 @@ def main():
                 if (randomSelect == 2 or randomSelect == 3 or randomSelect == 4) and len(os.listdir("/root/images-for-twitter")) > 0:
                     randomFile = random.choice(os.listdir("/root/images-for-twitter"))
                     print(randomFile)
-                    api.update_with_media(os.path.join("/root/images-for-twitter",randomFile ) , random.choice(tweetMessages) +" #cars #car #newcar")
+                    modelNameHashTag = ""
+                    spllittedName = randomFile.split("$$")
+                    if len(spllittedName) > 1:
+                        modelNameHashTag = "#"+spllittedName[0]
+                    api.update_with_media(os.path.join("/root/images-for-twitter",randomFile ) , random.choice(tweetMessages) +" " +modelNameHashTag+" #cars #car #newcar ")
                     os.remove(os.path.join("/root/images-for-twitter",randomFile ))
                 else:
                     witterResponseStatus = api.update_status(twitterStatus)
