@@ -16,6 +16,9 @@ import datetime
 
 from src.v2 import DBUtil
 from src.v2.Classes import Variant
+from src.v2.Classes import LightCarWithRank
+from src.v2.Classes import Comparison
+
 
 
 def getAllMakes():
@@ -42,3 +45,24 @@ def getVariants(make, model):
     for row in records:
         allVariants.append(Variant(int(row[0]), row[1]) )
     return allVariants
+
+
+def getPopularComparisons(page):
+    query = " select id, url, other_data  from cars.car_links order by id desc offset "+str((int(page)-1) * 4)+" limit 4 "
+    records = DBUtil.executeSelectQuery(query)
+    comparisons = []
+    for row in records:
+        id = row[0]
+        url = row[1]
+        response = row[2]
+        aComparison = []
+        if response and response['rank_data']:
+            rankData = response['rank_data']
+
+            for i in range(len(rankData['model_id'])):
+                aComparison.append(LightCarWithRank(rankData['model_id'][str(i)], rankData['model_make_display'][str(i)], rankData['model_name'][str(i)], rankData['model_trim'][str(i)], rankData['image'][str(i)], float(rankData['rnk_consolidate'][str(i)])))
+            aComparison.sort(key=lambda c: c.rank)
+        if len(aComparison) >= 2:
+            comparisons.append(Comparison(id, url, aComparison[0].image, aComparison[0].make, aComparison[0].model, aComparison[0].variant, aComparison[1].image, aComparison[1].make, aComparison[1].model, aComparison[1].variant))
+
+    return comparisons

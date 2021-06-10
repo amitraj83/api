@@ -735,6 +735,13 @@ def getVariantsV2():
     # return json.dumps(foundItems(key))
     return json.dumps([ob.__dict__ for ob in APIService.getVariants(make, model)])
 
+@app.route('/api/v2/car/popular-comparisons', methods=['GET'])
+def getPopularComparisons():
+    page = request.args.get('page')
+    if page == None or int(page) < 1:
+        page = 1
+    return json.dumps([ob.__dict__ for ob in APIService.getPopularComparisons(page)])
+
 
 @app.after_request
 def apply_caching(response):

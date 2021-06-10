@@ -104,3 +104,30 @@ class Variant:
         self.label = label
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
+
+class LightCarWithRank:
+    def __init__(self, id, make, model, variant, image, rank):
+        self.id = id
+        self.make = make
+        self.model = model
+        self.variant = variant
+        self.image = image
+        self.rank = rank
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
+class Comparison:
+    def __init__(self, id, url, car1Image, car1Make, car1Model, car1Trim, car2Image, car2Make, car2Model, car2Trim ):
+        self.id = id
+        self.url = url
+        self.car1Image = car1Image
+        self.car1Make = car1Make
+        self.car1Model = car1Model
+        self.car1Trim = car1Trim
+        self.car2Image = car2Image
+        self.car2Make = car2Make
+        self.car2Model = car2Model
+        self.car2Trim = car2Trim
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
