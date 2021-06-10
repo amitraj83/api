@@ -15,6 +15,7 @@ import json
 import datetime
 
 from src.v2 import DBUtil
+from src.v2.Classes import Variant
 
 
 def getAllMakes():
@@ -32,3 +33,12 @@ def getAllModels(make):
     for row in records:
         allModels.append(row[0].title())
     return allModels
+
+
+def getVariants(make, model):
+    query = " select model_id, model_year ||' - '|| model_trim from cars.car where lower(model_make_id) = lower('"+make+"') and lower(model_name) = lower('"+model+"') and model_trim != '' order by model_year desc "
+    records = DBUtil.executeSelectQuery(query)
+    allVariants = []
+    for row in records:
+        allVariants.append(Variant(int(row[0]), row[1]) )
+    return allVariants

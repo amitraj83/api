@@ -728,6 +728,12 @@ def getModelsV2():
     make = request.args.get('make')
     return json.dumps(APIService.getAllModels(make))
 
+@app.route('/api/v2/car/variants', methods=['GET'])
+def getVariantsV2():
+    make = request.args.get('make')
+    model = request.args.get('model')
+    # return json.dumps(foundItems(key))
+    return json.dumps([ob.__dict__ for ob in APIService.getVariants(make, model)])
 
 
 @app.after_request
