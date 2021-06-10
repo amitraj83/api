@@ -18,6 +18,7 @@ import datetime
 from TitleGenerator import generateSEOTitleDescriptionKeywords
 from ContentGenerator import getHTMLContent
 from Classes import Car
+from v2 import APIService
 
 
 app = flask.Flask(__name__)
@@ -59,6 +60,23 @@ class Variant:
     def __init__(self, value, label):
         self.value = value
         self.label = label
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
+
+
+class LinkInformation:
+    def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data, url, carDetails, keywords):
+        self.id = id
+        self.car_ids = car_ids
+        self.criteria = criteria
+        self.response = response
+        self.display_text = display_text
+        self.summary = summary
+        self.page_title = page_title
+        self.other_data = other_data
+        self.url = url
+        self.carDetails = carDetails
+        self.keywords = keywords
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
@@ -133,22 +151,6 @@ defaultCriteria = {
   ]
   
 }
-
-class LinkInformation:
-    def __init__(self, id, car_ids, criteria, response, display_text, summary, page_title, other_data, url, carDetails, keywords):
-        self.id = id
-        self.car_ids = car_ids
-        self.criteria = criteria
-        self.response = response
-        self.display_text = display_text
-        self.summary = summary
-        self.page_title = page_title
-        self.other_data = other_data
-        self.url = url
-        self.carDetails = carDetails
-        self.keywords = keywords
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 def compareData(vid1, vid2, vid3):
     connection = psycopg2.connect(user="postgres", password="postgres", host="127.0.0.1", port="5432",
@@ -713,6 +715,19 @@ def getBlogsLInks():
 def getThreeBlogsLInks():
 
     return json.dumps(getThreeRandomBlogLinks());
+
+
+@app.route('/api/v2/car/makes', methods=['GET'])
+def getMakesV2():
+
+    # return json.dumps(foundItems(key))
+    return json.dumps(APIService.getAllMakes())
+
+@app.route('/api/v2/car/models', methods=['GET'])
+def getModelsV2():
+    make = request.args.get('make')
+    return json.dumps(APIService.getAllModels(make))
+
 
 
 @app.after_request
