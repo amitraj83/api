@@ -742,6 +742,14 @@ def getPopularComparisons():
         page = 1
     return json.dumps([ob.__dict__ for ob in APIService.getPopularComparisons(page)])
 
+@app.route('/api/v2/car/comparison-result', methods=['GET'])
+def getComparisonResult():
+    id = request.args.get('id')
+    if id == None or int(id) < 1:
+        return ""
+    return APIService.getComparisonResult(id).toJSON()
+
+
 
 @app.after_request
 def apply_caching(response):

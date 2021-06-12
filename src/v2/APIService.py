@@ -18,6 +18,8 @@ from src.v2 import DBUtil
 from src.v2.Classes import Variant
 from src.v2.Classes import LightCarWithRank
 from src.v2.Classes import Comparison
+from src.v2.Classes import ComparisonCriteria
+from src.v2.Classes import ComparisonPageData
 
 
 
@@ -66,3 +68,21 @@ def getPopularComparisons(page):
             comparisons.append(Comparison(id, url, aComparison[0].image, aComparison[0].make, aComparison[0].model, aComparison[0].variant, aComparison[1].image, aComparison[1].make, aComparison[1].model, aComparison[1].variant))
 
     return comparisons
+
+
+def getComparisonResult(id):
+    query = " select car_ids, criteria, page_title, other_data from cars.car_links where id =  "+str(id)
+    records = DBUtil.executeSelectQuery(query)
+    comparison = None
+    criterias = []
+    title = ""
+    headPara = ""
+    for row in records:
+        criteria = row[1]
+        title = row[2]
+        otherData = row[3]
+        headPara = otherData['blog_content']['jsonTemplate']['headPara']
+        for c in criteria:
+            criterias.append(ComparisonCriteria(c['id'], c['col_name'], c['displayname'], True if c['preference'] == "True" else False))
+    comparison = ComparisonPageData(criterias, title, headPara)
+    return comparison

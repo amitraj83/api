@@ -131,3 +131,22 @@ class Comparison:
         self.car2Trim = car2Trim
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
+class ComparisonCriteria:
+    def __init__(self, id, colName, name, higher):
+        self.id = id
+        self.colName = colName
+        self.name = name
+        self.higher = higher
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
+class ComparisonPageData:
+    def __init__(self, criteria, title, headPara):
+        self.criteria = criteria
+        self.title = title
+        self.headPara = headPara
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
