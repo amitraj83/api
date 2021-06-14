@@ -106,16 +106,32 @@ class Variant:
         return json.dumps(self, default=lambda o: o.__dict__,sort_keys=True, indent=4)
 
 class LightCarWithRank:
-    def __init__(self, id, make, model, variant, image, rank):
+    def __init__(self, id, make, model, variant, image, rank, year):
         self.id = id
         self.make = make
         self.model = model
         self.variant = variant
         self.image = image
         self.rank = rank
+        self.year = year
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
+class CarWithRankAndPopularity:
+    def __init__(self, id, make, model, variant, image, rank, year, popularity):
+        self.id = id
+        self.make = make
+        self.model = model
+        self.variant = variant
+        self.image = image
+        self.rank = rank
+        self.year = year
+        self.popularity = popularity
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
 
 class Comparison:
     def __init__(self, id, url, car1Image, car1Make, car1Model, car1Trim, car2Image, car2Make, car2Model, car2Trim ):
@@ -143,10 +159,31 @@ class ComparisonCriteria:
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 class ComparisonPageData:
-    def __init__(self, criteria, title, headPara):
+    def __init__(self, criteria, title, headPara, threeCarsComparison, carsData, categorizedSpecs, descriptions, verdict):
         self.criteria = criteria
         self.title = title
         self.headPara = headPara
+        self.threeCarsComparison = threeCarsComparison
+        self.carsData = carsData
+        self.categorizedSpecs = categorizedSpecs
+        self.descriptions = descriptions
+        self.verdict = verdict
 
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
+class ThreeCarsSpec:
+    def __init__(self, name, car1, car2, car3):
+        self.name = name
+        self.car1 = car1
+        self.car2 = car2
+        self.car3 = car3
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
+class CategorizedSpecs:
+    def __init__(self, categoryName, details):
+        self.categoryName = categoryName
+        self.details = details
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

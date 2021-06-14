@@ -15,11 +15,14 @@ import json
 import datetime
 
 from src.v2 import DBUtil
-from src.v2.Classes import Variant
+from src.v2.Classes import Variant, CarWithRankAndPopularity
 from src.v2.Classes import LightCarWithRank
 from src.v2.Classes import Comparison
 from src.v2.Classes import ComparisonCriteria
 from src.v2.Classes import ComparisonPageData
+from src.v2.Util import carAndRankMap
+from src.v2.Util import getCategorizedSpecs
+from src.v2.Util import getDescriptions
 
 
 
@@ -62,7 +65,7 @@ def getPopularComparisons(page):
             rankData = response['rank_data']
 
             for i in range(len(rankData['model_id'])):
-                aComparison.append(LightCarWithRank(rankData['model_id'][str(i)], rankData['model_make_display'][str(i)], rankData['model_name'][str(i)], rankData['model_trim'][str(i)], rankData['image'][str(i)], float(rankData['rnk_consolidate'][str(i)])))
+                aComparison.append(LightCarWithRank(rankData['model_id'][str(i)], rankData['model_make_display'][str(i)], rankData['model_name'][str(i)], rankData['model_trim'][str(i)], rankData['image'][str(i)], float(rankData['rnk_consolidate'][str(i)]), rankData['model_year'][str(i)]))
             aComparison.sort(key=lambda c: c.rank)
         if len(aComparison) >= 2:
             comparisons.append(Comparison(id, url, aComparison[0].image, aComparison[0].make, aComparison[0].model, aComparison[0].variant, aComparison[1].image, aComparison[1].make, aComparison[1].model, aComparison[1].variant))
@@ -77,12 +80,66 @@ def getComparisonResult(id):
     criterias = []
     title = ""
     headPara = ""
+    threeCarsComparison = False
+    carDetailsWhereClause = None
+    carRankMap = None
+    specDetails = []
+    descriptions = []
+    verdict = ""
     for row in records:
+        carIDs = row[0]
+        if len(carIDs) > 2:
+            threeCarsComparison = True
+        carDetailsWhereClause = str(carIDs).replace("[", "(").replace("]", ")")
         criteria = row[1]
         title = row[2]
         otherData = row[3]
+        carRankMap = carAndRankMap(otherData['rank_data'])
+        specDetails = getCategorizedSpecs(otherData['rank_data'])
+        descriptions = getDescriptions(otherData['blog_content'])
+        verdict = otherData['blog_content']["jsonTemplate"]["line4"]
         headPara = otherData['blog_content']['jsonTemplate']['headPara']
         for c in criteria:
             criterias.append(ComparisonCriteria(c['id'], c['col_name'], c['displayname'], True if c['preference'] == "True" else False))
-    comparison = ComparisonPageData(criterias, title, headPara)
+
+    if carDetailsWhereClause == None:
+        return
+
+    categoryQuery = " select col_name, display_name, category from cars.criteria where category != 'NoDisplay' "
+    categoryQueryRecords = DBUtil.executeSelectQuery(categoryQuery)
+    categoryDict = {}
+    for cat in categoryQueryRecords:
+        categoryDict[cat[0]] = {"displayName":cat[1], "category":cat[2]}
+
+    carQuery = " select model_id, model_make_id, model_name, model_trim, image, model_year, popularity from cars.car where model_id in  "+carDetailsWhereClause
+    carQueryRecords = DBUtil.executeSelectQuery(carQuery)
+    carsData = []
+
+    for car in carQueryRecords:
+        carId = int(car[0])
+        popularity = int(car[6])
+        if popularity == 0:
+            popularity = randrange(30,60)
+        carsData.append(CarWithRankAndPopularity(carId, str(car[1]).title(), str(car[2]).title(), str(car[3]).title(), "/images/"+str(car[4]), carRankMap[carId], int(car[5]), popularity))
+
+    categorizedSpecs = []
+    for detail in specDetails:
+        name = detail["name"]
+        if detail["car1"] == 0 or detail["car2"] == 0 or detail["car3"] == 0:
+            continue
+        if name in list(categoryDict.keys()):
+            category = categoryDict[name]['category']
+            displayName = categoryDict[name]['displayName']
+
+            categoryObjectFound = False
+            for cs in categorizedSpecs:
+                if str(cs["categoryName"]).lower() == str(category).lower():
+                    detail["name"] = displayName
+                    cs["details"].append(detail)
+                    categoryObjectFound = True
+            if categoryObjectFound == False:
+                detail["name"] = displayName
+                categorizedSpecs.append({"categoryName":category, "details":[detail]})
+
+    comparison = ComparisonPageData(criterias, title, headPara,  threeCarsComparison, carsData, categorizedSpecs, descriptions, verdict)
     return comparison
