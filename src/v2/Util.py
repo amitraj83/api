@@ -33,3 +33,6 @@ def getDescriptions(blog_content):
         content = blog_content["jsonTemplate"]["line3"][i]
         descriptions.append({"title":title, "content":content})
     return descriptions
+
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")

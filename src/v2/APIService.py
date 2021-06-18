@@ -1,8 +1,7 @@
 import psycopg2
 
 import datetime
-import numpy as np
-import pandas as pd
+
 import os
 import os.path
 from os import path
@@ -15,7 +14,7 @@ import json
 import datetime
 
 from src.v2 import DBUtil
-from src.v2.Classes import Variant, CarWithRankAndPopularity
+from src.v2.Classes import Variant, CarWithRankAndPopularity, Car
 from src.v2.Classes import LightCarWithRank
 from src.v2.Classes import Comparison
 from src.v2.Classes import ComparisonCriteria
@@ -23,6 +22,9 @@ from src.v2.Classes import ComparisonPageData
 from src.v2.Util import carAndRankMap
 from src.v2.Util import getCategorizedSpecs
 from src.v2.Util import getDescriptions
+from src.v2.PandaCarCompare import compareTwoCars, defaultCarComparisonCriteria
+from src.v2.CarCompareLinkGenerator import getCarComparisonLink
+
 
 
 
@@ -143,3 +145,58 @@ def getComparisonResult(id):
 
     comparison = ComparisonPageData(criterias, title, headPara,  threeCarsComparison, carsData, categorizedSpecs, descriptions, verdict)
     return comparison
+
+
+def getCarComparisonFeatures():
+    query = " select col_name, display_name, category, lower_is_better from cars.criteria where is_comparison_feature=true "
+    queryRecords = DBUtil.executeSelectQuery(query)
+    features = {}
+
+    for feature in queryRecords:
+        category = feature[2]
+        if not (category in features.keys()):
+            features[category] = []
+        features[category].append({"id":feature[0], "displayName":feature[1], "lowerIsBetter":feature[3]})
+    return features
+
+
+def getLightCarDetailsWithoutRank(id):
+    query = " select model_id, model_make_id, model_name, model_trim, image, model_year from cars.car where model_id = "+str(id)
+    queryRecords = DBUtil.executeSelectQuery(query)
+    for row in queryRecords:
+        return LightCarWithRank(row[0], str(row[1]).title(),  str(row[2]).title(), row[3], row[4], 0, row[5])
+    return {}
+
+def convertCarIDsIntoPGList(ids):
+    pgList = []
+    for i in range(len(ids)):
+        pgList.append(int(ids[i]))
+    return str(pgList).replace("[", " ( ").replace("]"," ) ")
+
+def makeCarCompareData(ids):
+    if len(str(ids).split(",")) > 2:
+        return {}
+
+    whereClause = " where model_id in "+convertCarIDsIntoPGList(str(ids).split(","))
+    print(whereClause)
+    query = " select model_id, model_make_id, model_name, model_trim, model_year, model_body, model_engine_position, model_engine_cc, model_engine_cyl, model_engine_type, model_engine_valves_per_cyl, model_engine_power_ps, model_engine_power_rpm, model_engine_torque_nm, model_engine_torque_rpm, model_engine_bore_mm, model_engine_stroke_mm, model_engine_compression, model_engine_fuel, model_top_speed_kph, model_0_to_100_kph, model_drive, model_transmission_type, model_seats, model_doors, model_weight_kg, model_length_mm, model_width_mm, model_height_mm, model_wheelbase_mm, model_lkm_hwy, model_lkm_mixed, model_lkm_city, model_fuel_cap_l, model_sold_in_us, model_co2, model_make_display, image from cars.car   "+whereClause
+    print(query)
+    queryRecords = DBUtil.executeSelectQuery(query)
+    data = []
+    for row in queryRecords:
+        data.append(
+            Car(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11],
+                row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22],
+                row[23], row[24], row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32], row[33],
+                row[34], row[35], row[36], row[37]))
+    return data
+
+def compareCars(ids, rankCriteria):
+    rank_json = {}
+    criteria = rankCriteria
+    if criteria == None:
+        criteria = defaultCarComparisonCriteria
+    carCompareData = makeCarCompareData(ids)
+    rank_json = compareTwoCars(carCompareData, criteria)
+    url = getCarComparisonLink(ids, rank_json, criteria)
+    return url

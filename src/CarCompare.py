@@ -750,6 +750,19 @@ def getComparisonResult():
     return APIService.getComparisonResult(id).toJSON()
 
 
+@app.route('/api/v2/car/comparison-features', methods=['GET'])
+def getComparisonFeaturesV2():
+    return json.dumps(APIService.getCarComparisonFeatures())
+
+@app.route('/api/v2/car/light-car/details', methods=['GET'])
+def getLightCarDetailsV2():
+    id = request.args.get('id')
+    return APIService.getLightCarDetailsWithoutRank(id).toJSON()
+
+@app.route('/api/v2/compare-rank/cars', methods=['GET'])
+def getcomparecarsV2():
+    ids = request.args.get('ids')
+    return APIService.compareCars(ids,None)
 
 @app.after_request
 def apply_caching(response):
