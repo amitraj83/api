@@ -122,13 +122,21 @@ def getComparisonResult(id):
         popularity = int(car[6])
         if popularity == 0:
             popularity = randrange(30,60)
-        carsData.append(CarWithRankAndPopularity(carId, str(car[1]).title(), str(car[2]).title(), str(car[3]).title(), "/images/"+str(car[4]), carRankMap[carId], int(car[5]), popularity))
+        trim = ""
+        if len(car) >= 4:
+            trim = str(car[3]).title()
+        print(    int(car[5]), popularity)
+        carsData.append(CarWithRankAndPopularity(carId, str(car[1]).title(), str(car[2]).title(), trim, "/images/"+str(car[4]), carRankMap[carId], int(car[5]), popularity))
 
     categorizedSpecs = []
     for detail in specDetails:
         name = detail["name"]
-        if detail["car1"] == 0 or detail["car2"] == 0 or detail["car3"] == 0:
-            continue
+        if 'car1' in detail and 'car2' in detail and 'car3' in detail:
+            if detail["car1"] == 0 or detail["car2"] == 0 or detail["car3"] == 0:
+                continue
+        elif 'car1' in detail and 'car2' in detail:
+            if detail["car1"] == 0 or detail["car2"] == 0:
+                continue
         if name in list(categoryDict.keys()):
             category = categoryDict[name]['category']
             displayName = categoryDict[name]['displayName']

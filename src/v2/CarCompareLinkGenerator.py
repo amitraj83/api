@@ -267,7 +267,7 @@ def getCarComparisonLink(ids, all_ranks_json, rankCriteria):
     postgres_insert_query += " VALUES ( %s, %s, %s, %s, %s, %s, %s, %s , %s, %s, %s )"
 
     record_to_insert = (
-    uniqueId, [int(ids[0]), int(ids[1])], json.dumps(rankCriteria), all_ranks_json, powerKeyword, description, title,
+    uniqueId, [int(ids.split(",")[0]), int(ids.split(",")[1])], json.dumps(rankCriteria), all_ranks_json, powerKeyword, description, title,
     json.dumps(otherData), url, ', '.join(keywords), powerKeyword,)
     executeInsertQuery(postgres_insert_query, record_to_insert)
     return url

@@ -7,7 +7,7 @@ def carAndRankMap(rank_data):
         data[int(rank_data['model_id']['0'])] = int(rank_data['rnk_consolidate_final']['0'])
     if rank_data['model_id']['1'] != None:
         data[int(rank_data['model_id']['1'])] = int(rank_data['rnk_consolidate_final']['1'])
-    if rank_data['model_id']['2'] != None:
+    if len(rank_data['model_id']) == 3 and rank_data['model_id']['2'] != None:
         data[int(rank_data['model_id']['2'])] = int(rank_data['rnk_consolidate_final']['2'])
     return data
 #list(rank_data)[5] name
