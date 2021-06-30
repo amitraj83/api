@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+from src.v2 import DBUtil
 
 defaultCarComparisonCriteria = [
             {
@@ -86,15 +86,25 @@ def compareTwoCars(data, rankCriteria):
         else:
             criteria = defaultCarComparisonCriteria
 
+        records = DBUtil.executeSelectQuery(" select col_name, importance from cars.criteria ")
+
         rankCriteriaColumns = []
         for i in range(len(criteria)):
-            cars['rnk_'+criteria[i]['col_name']] = cars[criteria[i]['col_name']].rank(ascending=(criteria[i]['preference'] == "True"))
-            totalWgt += int(criteria[0]['importance'])
+            cars['rnk_'+criteria[i]['col_name']] = cars[criteria[i]['col_name']].rank(ascending=(criteria[i]['preference'] == True))
+            importance = 3
+            for j in range(len(records)):
+                if records[j][0] == criteria[0]['col_name']:
+                    importance = int(records[j][1])
+            totalWgt += importance
             rankCriteriaColumns.append('rnk_'+criteria[i]['col_name'])
 
         if totalWgt != 0:
             for i in range(len(criteria)):
-                cars['wgt_' + criteria[i]['col_name']] = int(criteria[i]['importance']) / totalWgt
+                importance = 3
+                for j in range(len(records)):
+                    if records[j][0] == criteria[0]['col_name']:
+                        importance = int(records[j][1])
+                cars['wgt_' + criteria[i]['col_name']] = int(importance) / totalWgt
 
         rankConsolidate = 0
         for i in range(len(criteria)):

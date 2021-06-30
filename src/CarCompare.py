@@ -759,10 +759,13 @@ def getLightCarDetailsV2():
     id = request.args.get('id')
     return APIService.getLightCarDetailsWithoutRank(id).toJSON()
 
-@app.route('/api/v2/compare-rank/cars', methods=['GET'])
+@app.route('/api/v2/compare-rank/cars', methods=['POST'])
 def getcomparecarsV2():
     ids = request.args.get('ids')
-    return APIService.compareCars(ids,None)
+    rankCriteria = None
+    if request.content_length != None:
+        rankCriteria = json.loads(request.data)['criteria']
+    return APIService.compareCars(ids,rankCriteria)
 
 @app.after_request
 def apply_caching(response):

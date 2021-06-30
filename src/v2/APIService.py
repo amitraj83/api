@@ -102,7 +102,7 @@ def getComparisonResult(id):
         verdict = otherData['blog_content']["jsonTemplate"]["line4"]
         headPara = otherData['blog_content']['jsonTemplate']['headPara']
         for c in criteria:
-            criterias.append(ComparisonCriteria(c['id'], c['col_name'], c['displayname'], True if c['preference'] == "True" else False))
+            criterias.append(ComparisonCriteria(c['col_name'], c['col_name'], c['displayname'], True if (c['preference'] == "True" or c['preference'] == True) else False))
 
     if carDetailsWhereClause == None:
         return
@@ -164,7 +164,7 @@ def getCarComparisonFeatures():
         category = feature[2]
         if not (category in features.keys()):
             features[category] = []
-        features[category].append({"id":feature[0], "displayName":feature[1], "lowerIsBetter":feature[3]})
+        features[category].append({"id":feature[0], "displayName":feature[1], "lowerIsBetter":feature[3], "included":True})
     return features
 
 
@@ -202,9 +202,9 @@ def makeCarCompareData(ids):
 def compareCars(ids, rankCriteria):
     rank_json = {}
     criteria = rankCriteria
-    if criteria == None:
+    if criteria == None or len(criteria) == 0:
         criteria = defaultCarComparisonCriteria
     carCompareData = makeCarCompareData(ids)
     rank_json = compareTwoCars(carCompareData, criteria)
     url = getCarComparisonLink(ids, rank_json, criteria)
-    return url
+    return {"pushUrl":url}
