@@ -76,7 +76,7 @@ def getPopularComparisons(page):
 
 
 def getComparisonResult(id):
-    query = " select car_ids, criteria, page_title, other_data from cars.car_links where id =  "+str(id)
+    query = " select car_ids, criteria, page_title, other_data, url from cars.car_links where id =  "+str(id)
     records = DBUtil.executeSelectQuery(query)
     comparison = None
     criterias = []
@@ -88,6 +88,7 @@ def getComparisonResult(id):
     specDetails = []
     descriptions = []
     verdict = ""
+    url = ""
     for row in records:
         carIDs = row[0]
         if len(carIDs) > 2:
@@ -101,6 +102,7 @@ def getComparisonResult(id):
         descriptions = getDescriptions(otherData['blog_content'])
         verdict = otherData['blog_content']["jsonTemplate"]["line4"]
         headPara = otherData['blog_content']['jsonTemplate']['headPara']
+        url = row[4]
         for c in criteria:
             criterias.append(ComparisonCriteria(c['col_name'], c['col_name'], c['displayname'], True if (c['preference'] == "True" or c['preference'] == True) else False))
 
@@ -151,7 +153,7 @@ def getComparisonResult(id):
                 detail["name"] = displayName
                 categorizedSpecs.append({"categoryName":category, "details":[detail]})
 
-    comparison = ComparisonPageData(criterias, title, headPara,  threeCarsComparison, carsData, categorizedSpecs, descriptions, verdict)
+    comparison = ComparisonPageData(criterias, title, headPara,  threeCarsComparison, carsData, categorizedSpecs, descriptions, verdict, url)
     return comparison
 
 

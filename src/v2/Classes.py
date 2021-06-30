@@ -159,7 +159,7 @@ class ComparisonCriteria:
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 class ComparisonPageData:
-    def __init__(self, criteria, title, headPara, threeCarsComparison, carsData, categorizedSpecs, descriptions, verdict):
+    def __init__(self, criteria, title, headPara, threeCarsComparison, carsData, categorizedSpecs, descriptions, verdict, url):
         self.criteria = criteria
         self.title = title
         self.headPara = headPara
@@ -168,6 +168,7 @@ class ComparisonPageData:
         self.categorizedSpecs = categorizedSpecs
         self.descriptions = descriptions
         self.verdict = verdict
+        self.url = url
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
