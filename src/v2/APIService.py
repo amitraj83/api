@@ -1,17 +1,6 @@
-import psycopg2
 
-import datetime
-
-import os
-import os.path
-from os import path
 from random import randrange
-from string import Template
-import urllib
-import urllib.parse
-import psycopg2
-import json
-import datetime
+
 
 from src.v2 import DBUtil
 from src.v2.Classes import Variant, CarWithRankAndPopularity, Car
