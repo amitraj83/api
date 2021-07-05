@@ -747,7 +747,11 @@ def getComparisonResult():
     id = request.args.get('id')
     if id == None or int(id) < 1:
         return ""
-    return APIService.getComparisonResult(id).toJSON()
+    response = APIService.getComparisonResult(id)
+    if response == None:
+        return {}, 404
+    else:
+        return response.toJSON()
 
 
 @app.route('/api/v2/car/comparison-features', methods=['GET'])
