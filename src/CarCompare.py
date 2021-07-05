@@ -751,7 +751,7 @@ def getComparisonResult():
     if response == None:
         return {}, 404
     else:
-        return response.toJSON()
+        return response.toJSON(), 200
 
 
 @app.route('/api/v2/car/comparison-features', methods=['GET'])
