@@ -55,27 +55,24 @@ def main():
 
         count = 0
         totalIterations = 0;
-        while count < 2000 and totalIterations < 10000:
+        while count < 2 and totalIterations < 10:
             totalIterations += 1
             # print("Total Iterations: ", totalIterations)
             make1 = None
             make2 = None
-            make3 = None
             selectedModelID1 = None
             selectedModelID2 = None
-            selectedModelID3 = None
             listOfCars = []
-            while selectedModelID1 == None or selectedModelID2 == None or selectedModelID3 == None:
+            while selectedModelID1 == None or selectedModelID2 == None :
                 listOfCars = []
 
-                while make1 == None  or make2 == None or make3 == None:
+                while make1 == None  or make2 == None :
                     randomMake = makesArray[randrange(len(makesArray) - 1)]
                     if randomMake in counterMakes:
                         counterCarsArray = counterMakes[randomMake]
                         if counterCarsArray:
                             make1 = randomMake
                             make2 = counterCarsArray[randrange(len(counterCarsArray)-1)]
-                            make3 = counterCarsArray[randrange(len(counterCarsArray)-1)]
                     else:
                         make1 = None
                         continue
@@ -83,7 +80,6 @@ def main():
 
                 sqlQuery1 = "select model_id, model_name from cars.car where model_make_display ilike '"+make1+"'  and model_year = "+str(year)+" ORDER BY RANDOM() LIMIT 1"
                 sqlQuery2 = "select model_id, model_name from cars.car where model_make_display ilike '"+make2+"'  and model_year = "+str(year)+" ORDER BY RANDOM() LIMIT 1"
-                sqlQuery3 = "select model_id, model_name from cars.car where model_make_display ilike '"+make3+"'  and model_year = "+str(year)+" ORDER BY RANDOM() LIMIT 1"
 
                 cursor.execute(sqlQuery1)
                 selectedModelID1 = cursor.fetchone()
@@ -97,14 +93,7 @@ def main():
                     make1 = None
                     continue
                 listOfCars.append(selectedModelID2[0])
-                cursor.execute(sqlQuery3)
-                selectedModelID3 = cursor.fetchone()
-                if selectedModelID3 == None:
-                    make1 = None
-                    continue
-                listOfCars.append(selectedModelID3[0])
-                if selectedModelID1[1] == selectedModelID2[1] or selectedModelID2[1] == selectedModelID3[1] or selectedModelID3[1] == selectedModelID1[1]:
-                    selectedModelID3 = None
+                if selectedModelID1[1] == selectedModelID2[1] :
                     selectedModelID2 = None
                     selectedModelID1 = None
                     make1 = None
@@ -126,10 +115,10 @@ def main():
             if carCheckRecords[0] and int(carCheckRecords[0][0]) > 0:
                 print("Existing record found")
             else:
-                if len(listOfCars) == 3:
+                if len(listOfCars) == 2:
 
                     # print(str(listOfCars))
-                    response = requests.post('http://localhost:5000/api/compare/cars', data='{"criteria":[{"id":880,"col_name":"model_year","displayname":"Model Year","preference":"False","importance":"5"},{"id":8900,"col_name":"model_engine_cc","displayname":"Engine size (cc)","preference":"False","importance":"5"},{"id":6294,"col_name":"model_engine_cyl","displayname":"Engine Cylinder","preference":"False","importance":"3"},{"id":367,"col_name":"model_engine_power_rpm","displayname":"Engine power (rpm)","preference":"False","importance":"2"},{"id":8245,"col_name":"model_engine_torque_rpm","displayname":"Engine Torque (rpm)","preference":"False","importance":"2"},{"id":1234,"col_name":"model_seats","displayname":"Seats","preference":"True","importance":"4"},{"id":4567,"col_name":"model_doors","displayname":"Doors","preference":"True","importance":"3"},{"id":765,"col_name":"model_width_mm","displayname":"Width (mm)","preference":"True","importance":"5"},{"id":3756,"col_name":"model_height_mm","displayname":"Height (mm)","preference":"True","importance":"5"}],"cars":'+str(listOfCars)+'}')
+                    response = requests.post('http://localhost:5000/api/v2/compare-rank/cars?ids='+str(int(selectedModelID1[0]))+','+str(int(selectedModelID2[0])), data='{"criteria":[{"id":880,"col_name":"model_year","displayname":"Model Year","preference":"True","importance":"5"},{"id":8900,"col_name":"model_engine_cc","displayname":"Engine size (cc)","preference":"True","importance":"5"},{"id":6294,"col_name":"model_engine_cyl","displayname":"Engine Cylinder","preference":"True","importance":"3"},{"id":367,"col_name":"model_engine_power_rpm","displayname":"Engine power (rpm)","preference":"True","importance":"2"},{"id":8245,"col_name":"model_engine_torque_rpm","displayname":"Engine Torque (rpm)","preference":"True","importance":"2"},{"id":1234,"col_name":"model_seats","displayname":"Seats","preference":"True","importance":"4"},{"id":4567,"col_name":"model_doors","displayname":"Doors","preference":"True","importance":"3"},{"id":765,"col_name":"model_width_mm","displayname":"Width (mm)","preference":"False","importance":"5"},{"id":3756,"col_name":"model_height_mm","displayname":"Height (mm)","preference":"False","importance":"5"}]}')
                     count += 1
                     #print(count)
                     #quit(0)
