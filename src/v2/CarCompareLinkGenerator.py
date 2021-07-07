@@ -1,10 +1,10 @@
 from string import Template
 from random import randrange
 import json
-from src.v2.DBUtil import getCarComparisonUniqueNumber
-from src.v2.DBUtil import executeInsertQuery
-from src.v2.Classes import LightCarWithRank
-from src.v2.Util import str2bool
+from v2.DBUtil import getCarComparisonUniqueNumber
+from v2.DBUtil import executeInsertQuery
+from v2.Classes import LightCarWithRank
+from v2.Util import str2bool
 import os
 import urllib
 import urllib.parse

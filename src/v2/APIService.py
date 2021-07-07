@@ -2,17 +2,17 @@
 from random import randrange
 
 
-from src.v2 import DBUtil
-from src.v2.Classes import Variant, CarWithRankAndPopularity, Car
-from src.v2.Classes import LightCarWithRank
-from src.v2.Classes import Comparison
-from src.v2.Classes import ComparisonCriteria
-from src.v2.Classes import ComparisonPageData
-from src.v2.Util import carAndRankMap
-from src.v2.Util import getCategorizedSpecs
-from src.v2.Util import getDescriptions
-from src.v2.PandaCarCompare import compareTwoCars, defaultCarComparisonCriteria
-from src.v2.CarCompareLinkGenerator import getCarComparisonLink
+from v2 import DBUtil
+from v2.Classes import Variant, CarWithRankAndPopularity, Car
+from v2.Classes import LightCarWithRank
+from v2.Classes import Comparison
+from v2.Classes import ComparisonCriteria
+from v2.Classes import ComparisonPageData
+from v2.Util import carAndRankMap
+from v2.Util import getCategorizedSpecs
+from v2.Util import getDescriptions
+from v2.PandaCarCompare import compareTwoCars, defaultCarComparisonCriteria
+from v2.CarCompareLinkGenerator import getCarComparisonLink
 
 
 

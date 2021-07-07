@@ -55,7 +55,7 @@ def main():
 
         count = 0
         totalIterations = 0;
-        while count < 5000 and totalIterations < 50000:
+        while count < 2000 and totalIterations < 10000:
             totalIterations += 1
             # print("Total Iterations: ", totalIterations)
             make1 = None
