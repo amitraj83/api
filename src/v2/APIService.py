@@ -142,8 +142,92 @@ def getComparisonResult(id):
                 detail["name"] = displayName
                 categorizedSpecs.append({"categoryName":category, "details":[detail]})
 
-    comparison = ComparisonPageData(criterias, title, headPara,  threeCarsComparison, carsData, categorizedSpecs, descriptions, verdict, url)
+    comparison = ComparisonPageData(criterias, title, headPara,  threeCarsComparison, carsData, categorizedSpecs, [], "", url)
     return comparison
+
+
+
+def getComparisonResultContent(id):
+    query = " select car_ids, criteria, page_title, other_data, url from cars.car_links where id =  "+str(id)
+    records = DBUtil.executeSelectQuery(query)
+    comparison = None
+    criterias = []
+    title = ""
+    headPara = ""
+    threeCarsComparison = False
+    carDetailsWhereClause = None
+    carRankMap = None
+    specDetails = []
+    descriptions = []
+    verdict = ""
+    url = ""
+    for row in records:
+        carIDs = row[0]
+        if len(carIDs) > 2:
+            threeCarsComparison = True
+        carDetailsWhereClause = str(carIDs).replace("[", "(").replace("]", ")")
+        criteria = row[1]
+        title = row[2]
+        otherData = row[3]
+        carRankMap = carAndRankMap(otherData['rank_data'])
+        specDetails = getCategorizedSpecs(otherData['rank_data'])
+        descriptions = getDescriptions(otherData['blog_content'])
+        verdict = otherData['blog_content']["jsonTemplate"]["line4"]
+        headPara = otherData['blog_content']['jsonTemplate']['headPara']
+        url = row[4]
+        for c in criteria:
+            criterias.append(ComparisonCriteria(c['col_name'], c['col_name'], c['displayname'], True if (c['preference'] == "True" or c['preference'] == True) else False))
+
+    if carDetailsWhereClause == None:
+        return
+
+    categoryQuery = " select col_name, display_name, category from cars.criteria where category != 'NoDisplay' "
+    categoryQueryRecords = DBUtil.executeSelectQuery(categoryQuery)
+    categoryDict = {}
+    for cat in categoryQueryRecords:
+        categoryDict[cat[0]] = {"displayName":cat[1], "category":cat[2]}
+
+    carQuery = " select model_id, model_make_id, model_name, model_trim, image, model_year, popularity from cars.car where model_id in  "+carDetailsWhereClause
+    carQueryRecords = DBUtil.executeSelectQuery(carQuery)
+    carsData = []
+
+    for car in carQueryRecords:
+        carId = int(car[0])
+        popularity = int(car[6])
+        if popularity == 0:
+            popularity = randrange(30,60)
+        trim = ""
+        if len(car) >= 4:
+            trim = str(car[3]).title()
+        print(    int(car[5]), popularity)
+        carsData.append(CarWithRankAndPopularity(carId, str(car[1]).title(), str(car[2]).title(), trim, "/images/"+str(car[4]), carRankMap[carId], int(car[5]), popularity))
+
+    categorizedSpecs = []
+    for detail in specDetails:
+        name = detail["name"]
+        if 'car1' in detail and 'car2' in detail and 'car3' in detail:
+            if detail["car1"] == 0 or detail["car2"] == 0 or detail["car3"] == 0:
+                continue
+        elif 'car1' in detail and 'car2' in detail:
+            if detail["car1"] == 0 or detail["car2"] == 0:
+                continue
+        if name in list(categoryDict.keys()):
+            category = categoryDict[name]['category']
+            displayName = categoryDict[name]['displayName']
+
+            categoryObjectFound = False
+            for cs in categorizedSpecs:
+                if str(cs["categoryName"]).lower() == str(category).lower():
+                    detail["name"] = displayName
+                    cs["details"].append(detail)
+                    categoryObjectFound = True
+            if categoryObjectFound == False:
+                detail["name"] = displayName
+                categorizedSpecs.append({"categoryName":category, "details":[detail]})
+
+    # comparison = ComparisonPageData(criterias, title, headPara,  threeCarsComparison, carsData, categorizedSpecs, [], "", url)
+    return {"descriptions":descriptions, "verdict":verdict}
+
 
 
 def getCarComparisonFeatures():

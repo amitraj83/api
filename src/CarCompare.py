@@ -754,6 +754,20 @@ def getComparisonResult():
         return response.toJSON(), 200
 
 
+@app.route('/api/v2/car/comparison-result-content', methods=['GET'])
+def getComparisonResultContent():
+    id = request.args.get('id')
+    if id == None or int(id) < 1:
+        return ""
+    response = APIService.getComparisonResultContent(id)
+    if response == None:
+        return {}, 404
+    else:
+        return response, 200
+
+
+
+
 @app.route('/api/v2/car/comparison-features', methods=['GET'])
 def getComparisonFeaturesV2():
     return json.dumps(APIService.getCarComparisonFeatures())
